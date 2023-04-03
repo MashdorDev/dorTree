@@ -1,0 +1,11 @@
+Model Information:
+* title:	WWE charater
+* source:	https://sketchfab.com/3d-models/wwe-charater-4881847622ab4aec90c7659e00913d7e
+* author:	GSMRF (https://sketchfab.com/gsmrf)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "WWE charater" (https://sketchfab.com/3d-models/wwe-charater-4881847622ab4aec90c7659e00913d7e) by GSMRF (https://sketchfab.com/gsmrf) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

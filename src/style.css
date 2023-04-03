@@ -2,6 +2,7 @@
 {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html,
@@ -10,10 +11,9 @@ body
     overflow: hidden;
 }
 
-.webgl
+.experience
 {
     position: fixed;
-    top: 0;
-    left: 0;
-    outline: none;
+    width: 100vw;
+    height: 100vh;
 }
