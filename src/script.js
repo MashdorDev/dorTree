@@ -115,47 +115,6 @@ backgroundMesh.frustumCulled = false;
 const backgroundScene = new THREE.Scene(); // New background scene
 backgroundScene.add(backgroundMesh);
 
-// Cube texture loader
-// Create a skybox using a large cube
-const skyboxVertexShader = `
-  varying vec3 vWorldPosition;
-
-  void main() {
-    vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-    vWorldPosition = worldPosition.xyz;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-  }
-`;
-
-const skyboxFragmentShader = `
-  varying vec3 vWorldPosition;
-  uniform vec3 color0;
-  uniform vec3 color1;
-  uniform vec3 color2;
-  uniform vec3 color3;
-
-  void main() {
-    vec3 direction = normalize(vWorldPosition);
-    float t = 0.5 * (1.0 + direction.y);
-    vec3 topColors = mix(color0, color1, t);
-    vec3 bottomColors = mix(color3, color2, t);
-    vec3 color = mix(topColors, bottomColors, direction.x);
-    gl_FragColor = vec4(color, 1.0);
-  }
-`;
-
-const skyboxMaterial = new THREE.ShaderMaterial({
-  vertexShader: skyboxVertexShader,
-  fragmentShader: skyboxFragmentShader,
-  uniforms: {
-    color0: { value: colors[0] },
-    color1: { value: colors[1] },
-    color2: { value: colors[2] },
-    color3: { value: colors[3] },
-  },
-  side: THREE.BackSide,
-});
-
 // Create buttons
 const createButton = (text, x) => {
   const buttonGeometry = new THREE.BoxGeometry(3, 1, 0.2);
