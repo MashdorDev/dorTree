@@ -1,24 +1,42 @@
 import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-function loadOBJModel() {
-  const loader = new OBJLoader();
-  const textureLoader = new THREE.TextureLoader(); // Create a texture loader
-  textureLoader.load('assets/texture/linkedin_texture.png', (texture) => { loader.load(
-    'assets/3d/linkedin.obj',
-    (object) => {
-      object.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          const texturedMaterial = new THREE.MeshStandardMaterial({ map: texture }); // Create a material with the loaded texture
-          child.material = texturedMaterial; // Apply the textured material to the child mesh
-        }
-      });
 
-      object.position.set(-5, 0, -5); // Set the position of the object
-      object.scale.set(1, 1, 1); // Set the scale of the object
-      scene.add(object); // Add the object to the scene
+const models = {
+  linkedin: {
+    url: 'assets/3d/linkedin.glb',
+    position: { x: -10, y: 0, z: -5 },
+    scale: { x: 10, y: 10, z: 10 },
+    rotation: { x: 0, y: 0, z: 0 },
+  },
+  github: {
+    url: 'assets/3d/github.glb',
+    position: { x: 10, y: 0, z: -5 },
+    scale: { x: 10, y: 10, z: 10 },
+    rotation: { x: 0, y: 0, z: 0 },
+
+  },
+  resume: {
+    url: 'assets/3d/resume.glb',
+    position: { x: 0, y: -5, z: -5 },
+    scale: { x: 5, y: 5, z: 5 },
+    rotation: { x: 0, y: 0, z: 0 },
+
+  },
+};
+
+function loadGLTFModel(model) {
+  const loader = new GLTFLoader();
+
+  loader.load(
+    model.url,
+    (gltf) => {
+      gltf.scene.position.set(model.position.x, model.position.y, model.position.z);
+      gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
+      gltf.scene.rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
+      scene.add(gltf.scene);
     },
     (xhr) => {
       console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -27,10 +45,11 @@ function loadOBJModel() {
       console.error('An error occurred while loading the model:', error);
     }
   );
-});
 }
 
-loadOBJModel(); // Call the function to load and add the OBJ model to the scene
+loadGLTFModel(models.linkedin);
+loadGLTFModel(models.github);
+loadGLTFModel(models.resume); // Call the function to load and add the OBJ model to the scene
 
 /*
  * Base
@@ -122,6 +141,7 @@ const material = new THREE.ShaderMaterial({
     color2: { value: colors[2] },
     color3: { value: colors[3] },
   },
+  depthTest: false,
 });
 
 function updateBackgroundColor(time) {
@@ -137,25 +157,6 @@ function updateBackgroundColor(time) {
   material.uniforms.color3.value = newColors[3];
 }
 
-// Create a full-screen quad for the gradient background
-const backgroundGeometry = new THREE.PlaneGeometry(2, 2);
-const backgroundMesh = new THREE.Mesh(backgroundGeometry, material);
-backgroundMesh.frustumCulled = false;
-backgroundMesh.position.z = -200; // Move the background quad further away
-
-const backgroundScene = new THREE.Scene(); // New background scene
-// backgroundScene.add(backgroundMesh);
-
-
-function createBox() {
-  const geometry = new THREE.BoxGeometry();
-  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  const cube = new THREE.Mesh(geometry, material);
-  cube.position.set(0, 0, -10);
-  scene.add(cube);
-}
-
-createBox();
 
 // Create buttons
 const createButton = (text, x) => {
@@ -175,7 +176,7 @@ scene.add(button1);
 scene.add(button2);
 scene.add(button3);
 
-const light = new THREE.PointLight(0xffffff, 1, 0);
+const light = new THREE.PointLight(0xffffff, 2, 0);
 light.position.set(0, 0, 10);
 scene.add(light);
 
@@ -185,6 +186,16 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
+
+
+// Background scene
+const backgroundScene = new THREE.Scene();
+
+// Skybox
+const skyboxGeometry = new THREE.PlaneBufferGeometry(2, 2);
+const skybox = new THREE.Mesh(skyboxGeometry, material);
+skybox.scale.set(1000, 1000, 1000);
+backgroundScene.add(skybox);
 
 renderer.domElement.addEventListener("click", (event) => {
   event.preventDefault();
@@ -208,7 +219,7 @@ renderer.domElement.addEventListener("click", (event) => {
 });
 
 function animate(time) {
-
+  updateBackgroundColor(time);
   controls.update();
   renderer.autoClear = false; // Add this line
   renderer.clear(); // Add this line
