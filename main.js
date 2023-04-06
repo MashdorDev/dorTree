@@ -176,9 +176,10 @@ scene.add(button1);
 scene.add(button2);
 scene.add(button3);
 
-const light = new THREE.PointLight(0xffffff, 2, 0);
-light.position.set(0, 0, 10);
-scene.add(light);
+
+const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 2.5 );
+scene.add( light );
+
 
 camera.position.z = 30;
 
