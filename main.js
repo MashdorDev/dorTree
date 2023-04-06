@@ -9,13 +9,13 @@ const models = {
     url: 'assets/3d/linkedin.glb',
     position: { x: -10, y: 0, z: -5 },
     scale: { x: 10, y: 10, z: 10 },
-    rotation: { x: 0, y: 0, z: 0 },
+    rotation: { x: -0.2, y:-0.3, z:-0.05  },
   },
   github: {
     url: 'assets/3d/github.glb',
     position: { x: 10, y: 0, z: -5 },
     scale: { x: 10, y: 10, z: 10 },
-    rotation: { x: 0, y: 0, z: 0 },
+    rotation: { x: -0.1, y: -0.4, z: 0 },
 
   },
   resume: {
