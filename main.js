@@ -1,88 +1,18 @@
-import './style.css';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
-
-const models = {
-  linkedin: {
-    url: 'assets/3d/linkedin.glb',
-    position: { x: -10, y: 0, z: -5 },
-    scale: { x: 10, y: 10, z: 10 },
-    rotation: { x: -0.2, y:-0.3, z:-0.05  },
-  },
-  github: {
-    url: 'assets/3d/github.glb',
-    position: { x: 10, y: 0, z: -5 },
-    scale: { x: 10, y: 10, z: 10 },
-    rotation: { x: -0.1, y: -0.4, z: 0 },
-
-  },
-  resume: {
-    url: 'assets/3d/resume.glb',
-    position: { x: 0, y: -5, z: -5 },
-    scale: { x: 5, y: 5, z: 5 },
-    rotation: { x: 0, y: 0, z: 0 },
-
-  },
-};
-
-function loadGLTFModel(model) {
-  const loader = new GLTFLoader();
-
-  loader.load(
-    model.url,
-    (gltf) => {
-      gltf.scene.position.set(model.position.x, model.position.y, model.position.z);
-      gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
-      gltf.scene.rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
-      scene.add(gltf.scene);
-    },
-    (xhr) => {
-      console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
-    },
-    (error) => {
-      console.error('An error occurred while loading the model:', error);
-    }
-  );
-}
-
-loadGLTFModel(models.linkedin);
-loadGLTFModel(models.github);
-loadGLTFModel(models.resume); // Call the function to load and add the OBJ model to the scene
+import "./style.css";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 /*
  * Base
  */
 
-const canvas = document.getElementById('bg');
+const canvas = document.getElementById("bg");
 
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
-
-window.addEventListener('resize', () => {
-  // Update sizes
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
-
-  // Update camera
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
-
-  // Update renderer
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
-
-// Handle window resize
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
   antialias: true,
@@ -96,8 +26,97 @@ const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
-  10000
+  100
 );
+
+// Handle window resize
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+
+const models = {
+  linkedin: {
+    url: "assets/3d/linkedin.glb",
+    position: { x: -10, y: 0, z: -5 },
+    scale: { x: 10, y: 10, z: 10 },
+    rotation: { x: -0.2, y: -0.3, z: -0.05 },
+    text: "LinkedIn",
+  },
+  github: {
+    url: "assets/3d/github.glb",
+    position: { x: 10, y: 0, z: -5 },
+    scale: { x: 10, y: 10, z: 10 },
+    rotation: { x: -0.1, y: -0.4, z: 0 },
+    text: "Github",
+  },
+  resume: {
+    url: "assets/3d/resume.glb",
+    position: { x: 0, y: -5, z: -5 },
+    scale: { x: 5, y: 5, z: 5 },
+    rotation: { x: 0, y: 0, z: 0 },
+    text: "Resume",
+  },
+};
+
+function loadGLTFModel(model) {
+  const loader = new GLTFLoader();
+
+  loader.load(
+    model.url,
+    (gltf) => {
+      gltf.scene.position.set(
+        model.position.x,
+        model.position.y,
+        model.position.z
+      );
+      gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
+      gltf.scene.rotation.set(
+        model.rotation.x,
+        model.rotation.y,
+        model.rotation.z
+      );
+      gltf.scene.traverse((child) => {
+        if (child.isMesh) {
+          child.geometry.computeBoundingBox();
+          child.geometry.computeBoundingSphere();
+        }
+      });
+      gltf.scene.userData = { text: model.text };
+      scene.add(gltf.scene);
+      model.scene = gltf.scene;
+    },
+    (xhr) => {
+      console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+    },
+    (error) => {
+      console.error("An error occurred while loading the model:", error);
+    }
+  );
+}
+
+loadGLTFModel(models.linkedin);
+loadGLTFModel(models.github);
+loadGLTFModel(models.resume); // Call the function to load and add the OBJ model to the scene
+
+
+
+window.addEventListener("resize", () => {
+  // Update sizes
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  // Update camera
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  // Update renderer
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
 
 // Gradient background setup
 const colors = [
@@ -145,7 +164,7 @@ const material = new THREE.ShaderMaterial({
 });
 
 function updateBackgroundColor(time) {
-  const t = (Math.sin(time * 0.0005) * 0.5) + 0.5;
+  const t = Math.sin(time * 0.0005) * 0.5 + 0.5;
   const newColors = colors.map((color, index) => {
     const nextIndex = (index + 1) % colors.length;
     return color.clone().lerp(colors[nextIndex], t);
@@ -157,7 +176,6 @@ function updateBackgroundColor(time) {
   material.uniforms.color3.value = newColors[3];
 }
 
-
 // Create buttons
 const createButton = (text, x) => {
   const buttonGeometry = new THREE.BoxGeometry(3, 1, 0.2);
@@ -168,20 +186,17 @@ const createButton = (text, x) => {
   return button;
 };
 
-const button1 = createButton("Button 1", -5);
-const button2 = createButton("Button 2", 0);
-const button3 = createButton("Button 3", 5);
+// const button1 = createButton("Button 1", -5);
+// const button2 = createButton("Button 2", 0);
+// const button3 = createButton("Button 3", 5);
 
-scene.add(button1);
-scene.add(button2);
-scene.add(button3);
+// scene.add(button1);
+// scene.add(button2);
+// scene.add(button3);
 
+const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 2.5);
+scene.add(light);
 
-const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 2.5 );
-scene.add( light );
-
-
-camera.position.z = 30;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -189,6 +204,7 @@ const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 
+camera.position.z = 30;
 // Background scene
 const backgroundScene = new THREE.Scene();
 
@@ -198,26 +214,99 @@ const skybox = new THREE.Mesh(skyboxGeometry, material);
 skybox.scale.set(1000, 1000, 1000);
 backgroundScene.add(skybox);
 
-renderer.domElement.addEventListener("click", (event) => {
+
+renderer.domElement.addEventListener("click", onModelClick);
+renderer.domElement.addEventListener("touchend", onModelClick);
+
+function onModelClick(event) {
   event.preventDefault();
 
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  if (event.type === "touchend") {
+    // Update the mouse coordinates for touch events
+    const touch = event.changedTouches[0];
+    mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+  } else {
+    // Update the mouse coordinates for click events
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  }
 
   raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(scene.children);
+  const validObjects = scene.children.filter((object) => !object.userData.ignoreRaycaster);
+  const intersects = raycaster.intersectObjects(validObjects, true);
+  console.log("intersects: ", intersects);
 
-  if (intersects.length > 0) {
-    const clickedObject = intersects[0].object;
-    if (clickedObject.userData.text == "Button 1") {
-      window.open('https://www.linkedin.com/search/results/all/?keywords=dor%20zairi', '_blank').focus();
-    }else if(clickedObject.userData.text == "Button 2"){
-      window.open('https://www.bing.com', '_blank').focus();
-    }else{
-      window.open('https://twitter.com/search?q=mashdor', '_blank').focus();
+
+
+  console.log("intersects userData:", intersects.map(intersect => intersect.object.userData));
+
+  const clickableIntersects = intersects.filter((intersect) => {
+    let currentObject = intersect.object;
+    while (currentObject) {
+      if (currentObject.userData.text) {
+        intersect.userData = currentObject.userData;
+        return true;
+      }
+      currentObject = currentObject.parent;
+    }
+    return false;
+  });
+
+  console.log("clickableIntersects: ", clickableIntersects);
+  if (clickableIntersects.length > 0) {
+    const clickedObject = clickableIntersects[0].object;
+
+    // Traverse up the hierarchy to find the parent model
+    let parentModel;
+    let currentObject = clickedObject;
+    while (currentObject) {
+      if (currentObject.userData.text) {
+        parentModel = currentObject;
+        break;
+      }
+      currentObject = currentObject.parent;
+    }
+
+    for (const model of Object.values(models)) {
+      if (parentModel === model.scene) {
+        handleModelClick(model);
+        break;
+      }
     }
   }
-});
+}
+
+function handleModelClick(model) {
+  switch (model.text) {
+    case "LinkedIn":
+      window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
+      break;
+    case "Github":
+      window.open("https://github.com/MashdorDev", "_blank").focus();
+      break;
+    case "Resume":
+      // window.open("https://resume.example.com", "_blank").focus();
+      fetch("assets/resume/Dor Zairi-Resume.pdf")
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "resume.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      });
+    break;
+      break;
+    default:
+      console.error("Unknown model:", model);
+  }
+}
+
+
 
 function animate(time) {
   updateBackgroundColor(time);
@@ -233,4 +322,3 @@ function animate(time) {
 requestAnimationFrame(animate);
 
 window.addEventListener("resize", onWindowResize, false);
-
