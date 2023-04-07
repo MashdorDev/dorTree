@@ -2,7 +2,54 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
+const fontLoader = new FontLoader();
+
+
+fontLoader.load('node_modules/three/examples/fonts/optimer_bold.typeface.json', function (font) {
+  const geometry = new TextGeometry('Dor Zairi', {
+    font: font,
+    size: 1,
+    height: 1,
+    curveSegments: 1,
+    bevelEnabled: true,
+    bevelThickness: 0,
+    bevelSize: 0,
+    bevelOffset: 0,
+    bevelSegments: 0
+  });
+
+  const vertexShader = `
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+  `;
+
+  const fragmentShader = `
+  varying vec2 vUv;
+
+  void main() {
+    vec3 color = vec3(1.0, 0.5, 0.0) * sin(10.0 * vUv.y - 5.0 * vUv.x) * 0.5 + 0.5;
+    gl_FragColor = vec4(color, 1.0);
+  }
+  `;
+
+  const material = new THREE.ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+  });
+
+  const text = new THREE.Mesh(geometry, material);
+  text.position.set(-2, 10, -5);
+  scene.add(text);
+
+  console.log(geometry);
+});
 /*
  * Base
  */
@@ -118,6 +165,35 @@ window.addEventListener("resize", () => {
 });
 
 
+// // Function to create 3D text
+// function createText(text, position, font) {
+//   const textGeometry = new THREE.TextGeometry(text, {
+//     font: font,
+//     size: 3, // Increase the size
+//     height: 0.1,
+//     curveSegments: 12,
+//     bevelEnabled: true,
+//     bevelThickness: 0.03,
+//     bevelSize: 0.02,
+//     bevelOffset: 0,
+//     bevelSegments: 5,
+//   });
+
+//   const textMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Change the color
+//   const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+//   textMesh.position.set(position.x, position.y, position.z);
+
+//   return textMesh;
+// }
+
+// // Load the font and add 3D text to the scene
+// const fontLoader = new FontLoader();
+// fontLoader.load(FontLocation, (font) => {
+//   const textMesh = createText("My 3D Text", { x: 0, y: 0, z: 0 }, font);
+//   console.log(textMesh);
+//   scene.add(textMesh);
+// });
+
 // Gradient background setup
 const colors = [
   new THREE.Color(0x0000ff),
@@ -176,23 +252,6 @@ function updateBackgroundColor(time) {
   material.uniforms.color3.value = newColors[3];
 }
 
-// Create buttons
-const createButton = (text, x) => {
-  const buttonGeometry = new THREE.BoxGeometry(3, 1, 0.2);
-  const buttonMaterial = new THREE.MeshNormalMaterial();
-  const button = new THREE.Mesh(buttonGeometry, buttonMaterial);
-  button.position.set(x, 0, -6);
-  button.userData = { text };
-  return button;
-};
-
-// const button1 = createButton("Button 1", -5);
-// const button2 = createButton("Button 2", 0);
-// const button3 = createButton("Button 3", 5);
-
-// scene.add(button1);
-// scene.add(button2);
-// scene.add(button3);
 
 const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 2.5);
 scene.add(light);
@@ -209,7 +268,7 @@ camera.position.z = 30;
 const backgroundScene = new THREE.Scene();
 
 // Skybox
-const skyboxGeometry = new THREE.PlaneBufferGeometry(2, 2);
+const skyboxGeometry = new THREE.PlaneGeometry(2, 2);
 const skybox = new THREE.Mesh(skyboxGeometry, material);
 skybox.scale.set(1000, 1000, 1000);
 backgroundScene.add(skybox);
