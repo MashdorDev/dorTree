@@ -390,29 +390,6 @@ function handleModelClick(model) {
 
   switch (model.text) {
     case "LinkedIn":
-function handleModelClick(model) {
-  function isMobileDevice() {
-    return (
-      typeof window.orientation !== "undefined" ||
-      navigator.userAgent.indexOf("IEMobile") !== -1
-    );
-  }
-
-  function openApp(customSchemeUrl, fallbackUrl) {
-    const startTime = Date.now();
-    const timeout = 500;
-
-    window.location = customSchemeUrl;
-
-    setTimeout(function () {
-      if (Date.now() - startTime < timeout + 100) {
-        window.open(fallbackUrl, "_blank").focus();
-      }
-    }, timeout);
-  }
-
-  switch (model.text) {
-    case "LinkedIn":
       if (isMobileDevice()) {
         const linkedinAppUrl = "linkedin://profile/dorz";
         const linkedinWebUrl = "https://www.linkedin.com/in/dorz";
@@ -450,37 +427,16 @@ function handleModelClick(model) {
       console.error("Unknown model:", model);
   }
 }
-      break;
-    case "Github":
-      window.open("https://github.com/MashdorDev", "_blank").focus();
-      break;
-    // Add your app case here if needed
-    case "Resume":
-      fetch("assets/resume/Dor Zairi-Resume.pdf")
-        .then((response) => response.blob())
-        .then((blob) => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "resume.pdf";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 100);
-        });
-      break;
-    default:
-      console.error("Unknown model:", model);
-  }
-}
+
+
 
 function animate(time) {
   updateBackgroundColor(time);
   controls.update();
-  renderer.autoClear = false; // Add this line
-  renderer.clear(); // Add this line
-  renderer.clearDepth(); // Add this line
-  renderer.render(backgroundScene, camera); // Render background scene
+  renderer.autoClear = false;
+  renderer.clear();
+  renderer.clearDepth();
+  renderer.render(backgroundScene, camera);
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
