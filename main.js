@@ -7,7 +7,6 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 
-
 /*
  * Init
  */
@@ -48,21 +47,21 @@ function onWindowResize() {
 
 const models = {
   linkedin: {
-    url: "public/assets/3d/linkedin.glb",
+    url: 'assets/linkedin.glb',
     position: { x: -10, y: 8, z: -5 },
     scale: { x: 8, y: 8, z: 8 },
     rotation: { x: -0.2, y: -0.3, z: -0.05 },
     text: "LinkedIn",
   },
   github: {
-    url: "public/assets/3d/github.glb",
+    url: 'assets/github.glb',
     position: { x: 10, y: 8, z: -5 },
     scale: { x: 9, y: 9, z: 9 },
     rotation: { x: -0.1, y: -0.4, z: 0 },
     text: "Github",
   },
   resume: {
-    url: "public/assets/3d/resume.glb",
+    url: 'assets/resume.glb',
     position: { x: 0, y: 0, z: -5 },
     scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
@@ -128,7 +127,7 @@ window.addEventListener("resize", () => {
 });
 
 fontLoader.load(
-  "fonts/optimer_bold.typeface.json",
+  "assets/font/optimer_regular.typeface.json",
   function (font) {
     const color = new THREE.Color("white");
 
