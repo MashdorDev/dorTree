@@ -1,3 +1,6 @@
+/*
+* Imports
+*/
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -9,9 +12,9 @@ import { TubeGeometry } from "three";
 import { Curve } from "three/src/extras/core/Curve.js";
 
 /*
- * Base
+ * Init
  */
-
+// Set up basic scene, renderer, and camera
 const canvas = document.getElementById("bg");
 const fontLoader = new FontLoader();
 
@@ -35,12 +38,16 @@ const camera = new THREE.PerspectiveCamera(
   500
 );
 
-// Handle window resize
+// Function to handle window resize events
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
+
+/*
+* Models and loader
+*/
 
 const models = {
   linkedin: {
@@ -66,6 +73,7 @@ const models = {
   },
 };
 
+// Load model
 function loadGLTFModel(model) {
   const loader = new GLTFLoader();
 
@@ -232,6 +240,9 @@ scene.add(pointLight);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(models.resume.position.x, models.resume.position.y, models.resume.position.z);
+controls.enableDamping = true;
+controls.dampingFactor = 0.01;
+controls.rotateSpeed = 0.9;
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -323,7 +334,6 @@ function handleModelClick(model) {
       window.open("https://github.com/MashdorDev", "_blank").focus();
       break;
     case "Resume":
-      // window.open("https://resume.example.com", "_blank").focus();
       fetch("assets/resume/Dor Zairi-Resume.pdf")
         .then((response) => response.blob())
         .then((blob) => {
@@ -336,7 +346,6 @@ function handleModelClick(model) {
           a.remove();
           setTimeout(() => URL.revokeObjectURL(url), 100);
         });
-      break;
       break;
     default:
       console.error("Unknown model:", model);
