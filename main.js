@@ -127,14 +127,12 @@ window.addEventListener("resize", () => {
 });
 
 fontLoader.load(
-  "assets/font/optimer_regular.typeface.json",
+  "assets/font/Montserrat_Medium_Regular.json",
   function (font) {
     const color = new THREE.Color("white");
 
-    const matLite = new THREE.MeshBasicMaterial({
+    const matLite = new THREE.MeshToonMaterial({
       color: color,
-      transparent: true,
-      opacity: 0.5,
       side: THREE.DoubleSide,
     });
 
