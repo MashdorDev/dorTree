@@ -88,41 +88,53 @@ const models = {
   },
 };
 
-// Load model
-function loadGLTFModel(model) {
+const progress = {
+  linkedin: 0,
+  github: 0,
+  resume: 0,
+};
+function loadGLTFModel(modelKey) {
+  const model = models[modelKey];
+  console.log("Loading model:", model);
   const loader = new GLTFLoader();
 
   return new Promise((resolve, reject) => {
     loader.load(
       model.url,
       (gltf) => {
-        gltf.scene.position.set(
-          model.position.x,
-          model.position.y,
-          model.position.z
-        );
-        gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
-        gltf.scene.rotation.set(
-          model.rotation.x,
-          model.rotation.y,
-          model.rotation.z
-        );
         gltf.scene.traverse((child) => {
           if (child.isMesh) {
-            child.geometry.computeBoundingBox();
-            child.geometry.computeBoundingSphere();
+            child.castShadow = true;
+            child.receiveShadow = true;
           }
         });
 
-        gltf.scene.userData = { text: model.text };
+        gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
+        gltf.scene.position.set(model.position.x, model.position.y, model.position.z);
+        gltf.scene.rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
+        gltf.scene.userData.text = model.text;
+
         scene.add(gltf.scene);
+
         model.scene = gltf.scene;
+
+        console.log("Model loaded:", model);
         resolve(gltf);
       },
       (xhr) => {
+        // Update progress for the current model
+        progress[modelKey] = Math.round((xhr.loaded / xhr.total) * 100);
+
+        // Calculate total progress
+        const totalProgress = Object.values(progress).reduce(
+          (sum, currProgress) => sum + currProgress,
+          0
+        );
+
         // Update loading screen progress
-        const progress = Math.round((xhr.loaded / xhr.total) * 100);
-        document.getElementById("loadingProgress").innerText = `${progress}%`;
+        document.getElementById(
+          "loadingProgress"
+        ).innerText = `${Math.round(totalProgress / (Object.keys(progress).length * 100) * 100)}%`;
       },
       (error) => {
         console.error("An error occurred while loading the model:", error);
@@ -132,16 +144,20 @@ function loadGLTFModel(model) {
   });
 }
 
+
+
 Promise.all([
-  loadGLTFModel(models.linkedin),
-  loadGLTFModel(models.github),
-  loadGLTFModel(models.resume),
+  loadGLTFModel("linkedin"),
+  loadGLTFModel("github"),
+  loadGLTFModel("resume"),
 ])
   .then(() => {
     console.log("All models loaded");
     // Hide loading screen when all models are loaded
+    const loadingScreen = document.getElementById("loadingScreen");
+    loadingScreen.style.opacity = "0";
     setTimeout(() => {
-      document.getElementById("loadingScreen").style.display = "none";
+      loadingScreen.style.display = "none";
     }, 500);
   })
   .catch((error) => {
