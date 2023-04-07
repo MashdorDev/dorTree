@@ -48,21 +48,21 @@ function onWindowResize() {
 
 const models = {
   linkedin: {
-    url: "assets/3d/linkedin.glb",
+    url: "https://github.com/MashdorDev/dorTree/blob/main/assets/3d/linkedin.glb",
     position: { x: -10, y: 8, z: -5 },
     scale: { x: 8, y: 8, z: 8 },
     rotation: { x: -0.2, y: -0.3, z: -0.05 },
     text: "LinkedIn",
   },
   github: {
-    url: "assets/3d/github.glb",
+    url: "https://github.com/MashdorDev/dorTree/blob/main/assets/3d/github.glb",
     position: { x: 10, y: 8, z: -5 },
     scale: { x: 9, y: 9, z: 9 },
     rotation: { x: -0.1, y: -0.4, z: 0 },
     text: "Github",
   },
   resume: {
-    url: "assets/3d/resume.glb",
+    url: "https://github.com/MashdorDev/dorTree/blob/main/assets/3d/resume.glb",
     position: { x: 0, y: 0, z: -5 },
     scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
