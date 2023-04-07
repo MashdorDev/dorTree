@@ -128,7 +128,7 @@ window.addEventListener("resize", () => {
 });
 
 fontLoader.load(
-  "node_modules/three/examples/fonts/optimer_bold.typeface.json",
+  "fonts/optimer_bold.typeface.json",
   function (font) {
     const color = new THREE.Color("white");
 
