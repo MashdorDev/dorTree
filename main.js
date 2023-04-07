@@ -34,13 +34,32 @@ const camera = new THREE.PerspectiveCamera(
   500
 );
 
-// Function to handle window resize events
+// Function to handle window resize and orientation change events
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width / sizes.height;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
 
+// Update the camera position for better visibility on mobile devices
+if (window.innerWidth < 768) {
+  camera.position.x = 0;
+  camera.position.y = 10;
+  camera.position.z = 40;
+} else {
+  camera.position.x = 0;
+  camera.position.y = 20;
+  camera.position.z = 30;
+}
+
+// Event listeners
+window.addEventListener("resize", onWindowResize, false);
+window.addEventListener("orientationchange", onWindowResize, false);
 /*
 * Models and loader
 */
@@ -73,44 +92,61 @@ const models = {
 function loadGLTFModel(model) {
   const loader = new GLTFLoader();
 
-  loader.load(
-    model.url,
-    (gltf) => {
-      gltf.scene.position.set(
-        model.position.x,
-        model.position.y,
-        model.position.z
-      );
-      gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
-      gltf.scene.rotation.set(
-        model.rotation.x,
-        model.rotation.y,
-        model.rotation.z
-      );
-      gltf.scene.traverse((child) => {
-        if (child.isMesh) {
-          child.geometry.computeBoundingBox();
-          child.geometry.computeBoundingSphere();
+  return new Promise((resolve, reject) => {
+    loader.load(
+      model.url,
+      (gltf) => {
+        gltf.scene.position.set(
+          model.position.x,
+          model.position.y,
+          model.position.z
+        );
+        gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
+        gltf.scene.rotation.set(
+          model.rotation.x,
+          model.rotation.y,
+          model.rotation.z
+        );
+        gltf.scene.traverse((child) => {
+          if (child.isMesh) {
+            child.geometry.computeBoundingBox();
+            child.geometry.computeBoundingSphere();
+          }
+        });
 
-        }
-      });
-
-      gltf.scene.userData = { text: model.text };
-      scene.add(gltf.scene);
-      model.scene = gltf.scene;
-    },
-    (xhr) => {
-      console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-    },
-    (error) => {
-      console.error("An error occurred while loading the model:", error);
-    }
-  );
+        gltf.scene.userData = { text: model.text };
+        scene.add(gltf.scene);
+        model.scene = gltf.scene;
+        resolve(gltf);
+      },
+      (xhr) => {
+        // Update loading screen progress
+        const progress = Math.round((xhr.loaded / xhr.total) * 100);
+        document.getElementById("loadingProgress").innerText = `${progress}%`;
+      },
+      (error) => {
+        console.error("An error occurred while loading the model:", error);
+        reject(error);
+      }
+    );
+  });
 }
 
-loadGLTFModel(models.linkedin);
-loadGLTFModel(models.github);
-loadGLTFModel(models.resume);
+Promise.all([
+  loadGLTFModel(models.linkedin),
+  loadGLTFModel(models.github),
+  loadGLTFModel(models.resume),
+])
+  .then(() => {
+    console.log("All models loaded");
+    // Hide loading screen when all models are loaded
+    setTimeout(() => {
+      document.getElementById("loadingScreen").style.display = "none";
+    }, 500);
+  })
+  .catch((error) => {
+    console.error("Error loading models:", error);
+  });
 
 window.addEventListener("resize", () => {
   // Update sizes
@@ -240,10 +276,6 @@ controls.rotateSpeed = 0.9;
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-
-camera.position.x = 0;
-camera.position.y = 20;
-camera.position.z = 30;
 
 // Background scene
 const backgroundScene = new THREE.Scene();
