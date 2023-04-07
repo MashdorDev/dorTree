@@ -3,36 +3,17 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { TubeGeometry } from "three";
+import { Curve } from "three/src/extras/core/Curve.js";
 
-const fontLoader = new FontLoader();
-
-
-fontLoader.load('node_modules/three/examples/fonts/optimer_bold.typeface.json', function (font) {
-  const geometry = new TextGeometry('Dor Zairi', {
-    font: font,
-    size: 5,
-    height: 1,
-    curveSegments: 5,
-    bevelEnabled: true,
-    bevelThickness: 0,
-    bevelSize: 0,
-    bevelOffset: 0,
-    bevelSegments: 0
-  });
-
-
-  const text = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
-  text.position.set(-13, 10, -6);
-  console.log(text);
-  scene.add(text);
-
-});
 /*
  * Base
  */
 
 const canvas = document.getElementById("bg");
+const fontLoader = new FontLoader();
 
 const sizes = {
   width: window.innerWidth,
@@ -51,7 +32,7 @@ const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
-  100
+  500
 );
 
 // Handle window resize
@@ -61,26 +42,25 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-
 const models = {
   linkedin: {
     url: "assets/3d/linkedin.glb",
-    position: { x: -10, y: 0, z: -5 },
-    scale: { x: 10, y: 10, z: 10 },
+    position: { x: -10, y: 8, z: -5 },
+    scale: { x: 8, y: 8, z: 8 },
     rotation: { x: -0.2, y: -0.3, z: -0.05 },
     text: "LinkedIn",
   },
   github: {
     url: "assets/3d/github.glb",
-    position: { x: 10, y: 0, z: -5 },
-    scale: { x: 10, y: 10, z: 10 },
+    position: { x: 10, y: 8, z: -5 },
+    scale: { x: 9, y: 9, z: 9 },
     rotation: { x: -0.1, y: -0.4, z: 0 },
     text: "Github",
   },
   resume: {
     url: "assets/3d/resume.glb",
-    position: { x: 0, y: -5, z: -5 },
-    scale: { x: 5, y: 5, z: 5 },
+    position: { x: 0, y: 0, z: -5 },
+    scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
   },
@@ -107,8 +87,10 @@ function loadGLTFModel(model) {
         if (child.isMesh) {
           child.geometry.computeBoundingBox();
           child.geometry.computeBoundingSphere();
+
         }
       });
+
       gltf.scene.userData = { text: model.text };
       scene.add(gltf.scene);
       model.scene = gltf.scene;
@@ -124,9 +106,7 @@ function loadGLTFModel(model) {
 
 loadGLTFModel(models.linkedin);
 loadGLTFModel(models.github);
-loadGLTFModel(models.resume); // Call the function to load and add the OBJ model to the scene
-
-
+loadGLTFModel(models.resume);
 
 window.addEventListener("resize", () => {
   // Update sizes
@@ -142,35 +122,36 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
+fontLoader.load(
+  "node_modules/three/examples/fonts/optimer_bold.typeface.json",
+  function (font) {
+    const color = new THREE.Color("white");
 
-// // Function to create 3D text
-// function createText(text, position, font) {
-//   const textGeometry = new THREE.TextGeometry(text, {
-//     font: font,
-//     size: 3, // Increase the size
-//     height: 0.1,
-//     curveSegments: 12,
-//     bevelEnabled: true,
-//     bevelThickness: 0.03,
-//     bevelSize: 0.02,
-//     bevelOffset: 0,
-//     bevelSegments: 5,
-//   });
+    const matLite = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.5,
+      side: THREE.DoubleSide,
+    });
 
-//   const textMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Change the color
-//   const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-//   textMesh.position.set(position.x, position.y, position.z);
+    const message = "Dor Zairi";
 
-//   return textMesh;
-// }
+    const shapes = font.generateShapes(message, 5);
 
-// // Load the font and add 3D text to the scene
-// const fontLoader = new FontLoader();
-// fontLoader.load(FontLocation, (font) => {
-//   const textMesh = createText("My 3D Text", { x: 0, y: 0, z: 0 }, font);
-//   console.log(textMesh);
-//   scene.add(textMesh);
-// });
+    const geometry = new THREE.ShapeGeometry(shapes);
+
+    geometry.computeBoundingBox();
+
+    const xMid =
+      -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+
+    geometry.translate(xMid, 0, 0);
+
+    const text = new THREE.Mesh(geometry, matLite);
+    text.position.set(0, 14, -15);
+    scene.add(text);
+  }
+);
 
 // Gradient background setup
 const colors = [
@@ -230,18 +211,35 @@ function updateBackgroundColor(time) {
   material.uniforms.color3.value = newColors[3];
 }
 
+/*
+* Lights
+*/
 
-const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 2.5);
+const light = new THREE.HemisphereLight(0xffffff, 0x080820, 1);
 scene.add(light);
 
+// Directional Light
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+dirLight.position.set(1, 2, 4);
+dirLight.castShadow = true;
+scene.add(dirLight);
+
+// Point Light
+const pointLight = new THREE.PointLight(0xffffff, 0.5);
+pointLight.position.set(0, 5, 0);
+pointLight.castShadow = true;
+scene.add(pointLight);
 
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(models.resume.position.x, models.resume.position.y, models.resume.position.z);
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-
+camera.position.x = 0;
+camera.position.y = 20;
 camera.position.z = 30;
+
 // Background scene
 const backgroundScene = new THREE.Scene();
 
@@ -250,7 +248,6 @@ const skyboxGeometry = new THREE.PlaneGeometry(2, 2);
 const skybox = new THREE.Mesh(skyboxGeometry, material);
 skybox.scale.set(1000, 1000, 1000);
 backgroundScene.add(skybox);
-
 
 renderer.domElement.addEventListener("click", onModelClick);
 renderer.domElement.addEventListener("touchend", onModelClick);
@@ -270,13 +267,16 @@ function onModelClick(event) {
   }
 
   raycaster.setFromCamera(mouse, camera);
-  const validObjects = scene.children.filter((object) => !object.userData.ignoreRaycaster);
+  const validObjects = scene.children.filter(
+    (object) => !object.userData.ignoreRaycaster
+  );
   const intersects = raycaster.intersectObjects(validObjects, true);
   console.log("intersects: ", intersects);
 
-
-
-  console.log("intersects userData:", intersects.map(intersect => intersect.object.userData));
+  console.log(
+    "intersects userData:",
+    intersects.map((intersect) => intersect.object.userData)
+  );
 
   const clickableIntersects = intersects.filter((intersect) => {
     let currentObject = intersect.object;
@@ -325,25 +325,23 @@ function handleModelClick(model) {
     case "Resume":
       // window.open("https://resume.example.com", "_blank").focus();
       fetch("assets/resume/Dor Zairi-Resume.pdf")
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "resume.pdf";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 100);
-      });
-    break;
+        .then((response) => response.blob())
+        .then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "resume.pdf";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 100);
+        });
+      break;
       break;
     default:
       console.error("Unknown model:", model);
   }
 }
-
-
 
 function animate(time) {
   updateBackgroundColor(time);
