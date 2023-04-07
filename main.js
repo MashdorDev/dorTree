@@ -11,9 +11,9 @@ const fontLoader = new FontLoader();
 fontLoader.load('node_modules/three/examples/fonts/optimer_bold.typeface.json', function (font) {
   const geometry = new TextGeometry('Dor Zairi', {
     font: font,
-    size: 1,
+    size: 5,
     height: 1,
-    curveSegments: 1,
+    curveSegments: 5,
     bevelEnabled: true,
     bevelThickness: 0,
     bevelSize: 0,
@@ -21,34 +21,12 @@ fontLoader.load('node_modules/three/examples/fonts/optimer_bold.typeface.json', 
     bevelSegments: 0
   });
 
-  const vertexShader = `
-  varying vec2 vUv;
 
-  void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-  `;
-
-  const fragmentShader = `
-  varying vec2 vUv;
-
-  void main() {
-    vec3 color = vec3(1.0, 0.5, 0.0) * sin(10.0 * vUv.y - 5.0 * vUv.x) * 0.5 + 0.5;
-    gl_FragColor = vec4(color, 1.0);
-  }
-  `;
-
-  const material = new THREE.ShaderMaterial({
-    vertexShader,
-    fragmentShader,
-  });
-
-  const text = new THREE.Mesh(geometry, material);
-  text.position.set(-2, 10, -5);
+  const text = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
+  text.position.set(-13, 10, -6);
+  console.log(text);
   scene.add(text);
 
-  console.log(geometry);
 });
 /*
  * Base
