@@ -368,13 +368,93 @@ function onModelClick(event) {
 }
 
 function handleModelClick(model) {
+  function isMobileDevice() {
+    return (
+      typeof window.orientation !== "undefined" ||
+      navigator.userAgent.indexOf("IEMobile") !== -1
+    );
+  }
+
+  function openApp(customSchemeUrl, fallbackUrl) {
+    const startTime = Date.now();
+    const timeout = 500;
+
+    window.location = customSchemeUrl;
+
+    setTimeout(function () {
+      if (Date.now() - startTime < timeout + 100) {
+        window.open(fallbackUrl, "_blank").focus();
+      }
+    }, timeout);
+  }
+
   switch (model.text) {
     case "LinkedIn":
-      window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
+function handleModelClick(model) {
+  function isMobileDevice() {
+    return (
+      typeof window.orientation !== "undefined" ||
+      navigator.userAgent.indexOf("IEMobile") !== -1
+    );
+  }
+
+  function openApp(customSchemeUrl, fallbackUrl) {
+    const startTime = Date.now();
+    const timeout = 500;
+
+    window.location = customSchemeUrl;
+
+    setTimeout(function () {
+      if (Date.now() - startTime < timeout + 100) {
+        window.open(fallbackUrl, "_blank").focus();
+      }
+    }, timeout);
+  }
+
+  switch (model.text) {
+    case "LinkedIn":
+      if (isMobileDevice()) {
+        const linkedinAppUrl = "linkedin://profile/dorz";
+        const linkedinWebUrl = "https://www.linkedin.com/in/dorz";
+        openApp(linkedinAppUrl, linkedinWebUrl);
+      } else {
+        window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
+      }
+      break;
+    case "Github":
+
+    if (isMobileDevice()) {
+      const linkedinAppUrl = "github://profile/MashdorDev";
+      const linkedinWebUrl = "https://www.github.com/MashdorDev";
+      openApp(linkedinAppUrl, linkedinWebUrl);
+    } else {
+      window.open("https://github.com/MashdorDev", "_blank").focus();
+    }
+      break;
+    // Add your app case here if needed
+    case "Resume":
+      fetch("assets/resume/Dor Zairi-Resume.pdf")
+        .then((response) => response.blob())
+        .then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "resume.pdf";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 100);
+        });
+      break;
+    default:
+      console.error("Unknown model:", model);
+  }
+}
       break;
     case "Github":
       window.open("https://github.com/MashdorDev", "_blank").focus();
       break;
+    // Add your app case here if needed
     case "Resume":
       fetch("assets/resume/Dor Zairi-Resume.pdf")
         .then((response) => response.blob())
