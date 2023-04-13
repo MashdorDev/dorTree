@@ -199,7 +199,7 @@ fontLoader.load(
 
 // resume text
 fontLoader.load(
-  "assets/font/Montserrat_Thin_Regular.json",
+  "assets/font/Montserrat_Medium_Regular.json",
   function (font) {
     const color = new THREE.Color("black");
 
