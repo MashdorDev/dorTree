@@ -395,6 +395,7 @@ function handleModelClick(model) {
     );
   }
 
+
   function openApp(customSchemeUrl, fallbackUrl) {
     const startTime = Date.now();
     const timeout = 500;
@@ -408,17 +409,22 @@ function handleModelClick(model) {
     }, timeout);
   }
 
+
   switch (model.text) {
     case "LinkedIn":
       if (isMobileDevice()) {
-        const linkedinAppUrl = "linkedin://profile/dorz";
         const linkedinWebUrl = "https://www.linkedin.com/in/dorz";
-        openApp(linkedinAppUrl, linkedinWebUrl);
+        const linkedinAppUrl = "linkedin://in/dorz";
+        window.location.href = linkedinAppUrl;
+        setTimeout(() => {
+          window.location.href = linkedinWebUrl;
+        }, 2000);
       } else {
         window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
       }
       break;
     case "Github":
+
 
     if (isMobileDevice()) {
       const linkedinAppUrl = "github://profile/MashdorDev";
@@ -427,6 +433,7 @@ function handleModelClick(model) {
     } else {
       window.open("https://github.com/MashdorDev", "_blank").focus();
     }
+
       break;
     // Add your app case here if needed
     case "Resume":
@@ -447,8 +454,6 @@ function handleModelClick(model) {
       console.error("Unknown model:", model);
   }
 }
-
-
 
 function animate(time) {
   updateBackgroundColor(time);
