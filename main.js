@@ -1,6 +1,7 @@
 /*
 * Imports
 */
+import './loader.js';
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -130,11 +131,6 @@ function loadGLTFModel(modelKey) {
           (sum, currProgress) => sum + currProgress,
           0
         );
-
-        // Update loading screen progress
-        document.getElementById(
-          "loadingProgress"
-        ).innerText = `${Math.round(totalProgress / (Object.keys(progress).length * 100) * 100)}%`;
       },
       (error) => {
         console.error("An error occurred while loading the model:", error);
@@ -145,7 +141,6 @@ function loadGLTFModel(modelKey) {
 }
 
 
-
 Promise.all([
   loadGLTFModel("linkedin"),
   loadGLTFModel("github"),
@@ -153,12 +148,6 @@ Promise.all([
 ])
   .then(() => {
     console.log("All models loaded");
-    // Hide loading screen when all models are loaded
-    const loadingScreen = document.getElementById("loadingScreen");
-    loadingScreen.style.opacity = "0";
-    setTimeout(() => {
-      loadingScreen.style.display = "none";
-    }, 500);
   })
   .catch((error) => {
     console.error("Error loading models:", error);
@@ -178,6 +167,7 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
+// Dor Zairi Text
 fontLoader.load(
   "assets/font/Montserrat_Medium_Regular.json",
   function (font) {
@@ -203,6 +193,36 @@ fontLoader.load(
 
     const text = new THREE.Mesh(geometry, matLite);
     text.position.set(0, 14, -15);
+    scene.add(text);
+  }
+);
+
+// resume text
+fontLoader.load(
+  "assets/font/Montserrat_Medium_Regular.json",
+  function (font) {
+    const color = new THREE.Color("black");
+
+    const matLite = new THREE.MeshToonMaterial({
+      color: color,
+      side: THREE.DoubleSide,
+    });
+
+    const message = "resume";
+
+    const shapes = font.generateShapes(message, 1);
+
+    const geometry = new THREE.ShapeGeometry(shapes);
+
+    geometry.computeBoundingBox();
+
+    const xMid =
+      -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+
+    geometry.translate(xMid, 0, 0);
+
+    const text = new THREE.Mesh(geometry, matLite);
+    text.position.set(-0.5, -2, -4);
     scene.add(text);
   }
 );
@@ -375,6 +395,21 @@ function handleModelClick(model) {
     );
   }
 
+
+  function openApp(customSchemeUrl, fallbackUrl) {
+    const startTime = Date.now();
+    const timeout = 500;
+
+    window.location = customSchemeUrl;
+
+    setTimeout(function () {
+      if (Date.now() - startTime < timeout + 100) {
+        window.open(fallbackUrl, "_blank").focus();
+      }
+    }, timeout);
+  }
+
+
   switch (model.text) {
     case "LinkedIn":
       if (isMobileDevice()) {
@@ -389,8 +424,16 @@ function handleModelClick(model) {
       }
       break;
     case "Github":
-      const githubWebUrl = "https://www.github.com/MashdorDev";
-      window.open(githubWebUrl, "_blank");
+
+
+    if (isMobileDevice()) {
+      const linkedinAppUrl = "github://profile/MashdorDev";
+      const linkedinWebUrl = "https://www.github.com/MashdorDev";
+      openApp(linkedinAppUrl, linkedinWebUrl);
+    } else {
+      window.open("https://github.com/MashdorDev", "_blank").focus();
+    }
+
       break;
     // Add your app case here if needed
     case "Resume":
@@ -412,15 +455,13 @@ function handleModelClick(model) {
   }
 }
 
-
-
 function animate(time) {
   updateBackgroundColor(time);
   controls.update();
-  renderer.autoClear = false; // Add this line
-  renderer.clear(); // Add this line
-  renderer.clearDepth(); // Add this line
-  renderer.render(backgroundScene, camera); // Render background scene
+  renderer.autoClear = false;
+  renderer.clear();
+  renderer.clearDepth();
+  renderer.render(backgroundScene, camera);
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
