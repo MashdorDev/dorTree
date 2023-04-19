@@ -437,13 +437,13 @@ function handleModelClick(model) {
       break;
     // Add your app case here if needed
     case "Resume":
-      fetch("assets/resume/Dor Zairi-Resume.pdf")
+      fetch("assets/resume/Dor Zairi - Resume.pdf")
         .then((response) => response.blob())
         .then((blob) => {
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = "resume.pdf";
+          a.download = "Dor Zairi - Resume.pdf";
           document.body.appendChild(a);
           a.click();
           a.remove();
