@@ -72,7 +72,6 @@ const models = {
     scale: { x: 8, y: 8, z: 8 },
     rotation: { x: -0.2, y: -0.3, z: -0.05 },
     text: "LinkedIn",
-    scene: null,
   },
   github: {
     url: 'assets/github.glb',
@@ -80,7 +79,6 @@ const models = {
     scale: { x: 9, y: 9, z: 9 },
     rotation: { x: -0.1, y: -0.4, z: 0 },
     text: "Github",
-    scenePointer: null,
 
   },
   resume: {
@@ -89,7 +87,13 @@ const models = {
     scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
-    scenePointer: null,
+  },
+  spaceShip: {
+    url: 'assets/spaceship.glb',
+    position: { x: 0, y: 0, z: -50 },
+    scale: { x: 6, y: 6, z: 6 },
+    rotation: { x: 0, y: 0, z: 0 },
+    text: "Space Ship",
   },
 };
 
@@ -145,9 +149,10 @@ function loadGLTFModel(modelKey) {
 
 
 Promise.all([
- models.linkedin.scene = loadGLTFModel("linkedin"),
+ loadGLTFModel("linkedin"),
   loadGLTFModel("github"),
   loadGLTFModel("resume"),
+  loadGLTFModel("spaceShip"),
 ])
   .then(() => {
     console.log("All models loaded");
@@ -448,11 +453,24 @@ function handleModelClick(model) {
   }
 }
 
+
+function float(elapsedTime) {
+  scene.children.forEach((child) => {
+    console.log("Child ", child.userData.text);
+    if (child.userData.text == "LinkedIn" || child.userData.text == "Github") {
+      child.position.y = models.linkedin.position.y + Math.sin(elapsedTime * 0.7);
+    }
+  });
+}
+
+
 const clock = new THREE.Clock();
+
 
 
 function animate(time) {
   const elapsedTime = clock.getElapsedTime();
+  float(elapsedTime);
 
   updateBackgroundColor(time);
   controls.update();
@@ -462,12 +480,7 @@ function animate(time) {
   renderer.render(backgroundScene, camera);
   renderer.render(scene, camera);
 
-  scene.children.forEach((child) => {
-    console.log("Child ", child.userData.text);
-    if (child.userData.text == "LinkedIn" || child.userData.text == "Github") {
-      child.position.y = models.linkedin.position.y + Math.sin(elapsedTime * 0.7);
-    }
-  });
+
 
   requestAnimationFrame(animate);
 }
