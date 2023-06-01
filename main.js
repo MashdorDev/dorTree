@@ -484,7 +484,7 @@ function animate(time) {
   renderer.render(backgroundScene, camera);
   renderer.render(scene, camera);
 
-  console.log(loadedModels.map((model) => model.name));
+  // console.log(loadedModels.map((model) => model.name));
   // if(loadedModels) {
   //   loadedModels["Space_Ship"].rotation.y += 0.9;
   // }
