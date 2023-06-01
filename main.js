@@ -14,6 +14,8 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 // Set up basic scene, renderer, and camera
 const canvas = document.getElementById("bg");
 const fontLoader = new FontLoader();
+const loadedModels = [];
+
 
 const sizes = {
   width: window.innerWidth,
@@ -88,12 +90,12 @@ const models = {
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
   },
-  spaceShip: {
+  space_ship: {
     url: 'assets/spaceship.glb',
     position: { x: 0, y: 0, z: -50 },
     scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
-    text: "Space Ship",
+    text: "Space_Ship",
   },
 };
 
@@ -122,11 +124,14 @@ function loadGLTFModel(modelKey) {
         gltf.scene.position.set(model.position.x, model.position.y, model.position.z);
         gltf.scene.rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
         gltf.scene.userData.text = model.text;
+        gltf.scene.name = model.text
 
         scene.add(gltf.scene);
 
         model.scene = gltf.scene;
+        loadedModels.push(model.scene);
         console.log("Model loaded:", model);
+        console.log("Loaded models:", loadedModels);
         resolve(gltf);
       },
       (xhr) => {
@@ -149,10 +154,10 @@ function loadGLTFModel(modelKey) {
 
 
 Promise.all([
- loadGLTFModel("linkedin"),
+loadGLTFModel("linkedin"),
   loadGLTFModel("github"),
   loadGLTFModel("resume"),
-  loadGLTFModel("spaceShip"),
+  loadGLTFModel("space_ship"),
 ])
   .then(() => {
     console.log("All models loaded");
@@ -456,7 +461,6 @@ function handleModelClick(model) {
 
 function float(elapsedTime) {
   scene.children.forEach((child) => {
-    console.log("Child ", child.userData.text);
     if (child.userData.text == "LinkedIn" || child.userData.text == "Github") {
       child.position.y = models.linkedin.position.y + Math.sin(elapsedTime * 0.7);
     }
@@ -480,7 +484,10 @@ function animate(time) {
   renderer.render(backgroundScene, camera);
   renderer.render(scene, camera);
 
-
+  console.log(loadedModels.map((model) => model.name));
+  // if(loadedModels) {
+  //   loadedModels["Space_Ship"].rotation.y += 0.9;
+  // }
 
   requestAnimationFrame(animate);
 }
