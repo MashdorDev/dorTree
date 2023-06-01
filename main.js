@@ -91,7 +91,7 @@ const models = {
     text: "Resume",
   },
   space_ship: {
-    url: 'assets/spaceship.glb',
+    url: 'assets/spaceShip.glb',
     position: { x: 0, y: 0, z: -50 },
     scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
