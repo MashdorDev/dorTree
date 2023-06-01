@@ -14,6 +14,8 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 // Set up basic scene, renderer, and camera
 const canvas = document.getElementById("bg");
 const fontLoader = new FontLoader();
+const loadedModels = [];
+
 
 const sizes = {
   width: window.innerWidth,
@@ -79,6 +81,7 @@ const models = {
     scale: { x: 9, y: 9, z: 9 },
     rotation: { x: -0.1, y: -0.4, z: 0 },
     text: "Github",
+
   },
   resume: {
     url: 'assets/resume.glb',
@@ -86,6 +89,13 @@ const models = {
     scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
+  },
+  space_ship: {
+    url: 'assets/spaceship.glb',
+    position: { x: 0, y: 0, z: -50 },
+    scale: { x: 6, y: 6, z: 6 },
+    rotation: { x: 0, y: 0, z: 0 },
+    text: "Space_Ship",
   },
 };
 
@@ -114,12 +124,14 @@ function loadGLTFModel(modelKey) {
         gltf.scene.position.set(model.position.x, model.position.y, model.position.z);
         gltf.scene.rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
         gltf.scene.userData.text = model.text;
+        gltf.scene.name = model.text
 
         scene.add(gltf.scene);
 
         model.scene = gltf.scene;
-
+        loadedModels.push(model.scene);
         console.log("Model loaded:", model);
+        console.log("Loaded models:", loadedModels);
         resolve(gltf);
       },
       (xhr) => {
@@ -142,9 +154,10 @@ function loadGLTFModel(modelKey) {
 
 
 Promise.all([
-  loadGLTFModel("linkedin"),
+loadGLTFModel("linkedin"),
   loadGLTFModel("github"),
   loadGLTFModel("resume"),
+  loadGLTFModel("space_ship"),
 ])
   .then(() => {
     console.log("All models loaded");
@@ -289,20 +302,9 @@ function updateBackgroundColor(time) {
 * Lights
 */
 
-const light = new THREE.HemisphereLight(0xffffff, 0x080820, 1);
+const light = new THREE.HemisphereLight(0xffffff, 0x080820, 2);
 scene.add(light);
 
-// Directional Light
-const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
-dirLight.position.set(1, 2, 4);
-dirLight.castShadow = true;
-scene.add(dirLight);
-
-// Point Light
-const pointLight = new THREE.PointLight(0xffffff, 0.5);
-pointLight.position.set(0, 5, 0);
-pointLight.castShadow = true;
-scene.add(pointLight);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(models.resume.position.x, models.resume.position.y, models.resume.position.z);
@@ -324,6 +326,7 @@ backgroundScene.add(skybox);
 
 renderer.domElement.addEventListener("click", onModelClick);
 renderer.domElement.addEventListener("touchend", onModelClick);
+
 
 function onModelClick(event) {
   event.preventDefault();
@@ -455,7 +458,24 @@ function handleModelClick(model) {
   }
 }
 
+
+function float(elapsedTime) {
+  scene.children.forEach((child) => {
+    if (child.userData.text == "LinkedIn" || child.userData.text == "Github") {
+      child.position.y = models.linkedin.position.y + Math.sin(elapsedTime * 0.7);
+    }
+  });
+}
+
+
+const clock = new THREE.Clock();
+
+
+
 function animate(time) {
+  const elapsedTime = clock.getElapsedTime();
+  float(elapsedTime);
+
   updateBackgroundColor(time);
   controls.update();
   renderer.autoClear = false;
@@ -463,9 +483,14 @@ function animate(time) {
   renderer.clearDepth();
   renderer.render(backgroundScene, camera);
   renderer.render(scene, camera);
+
+  // console.log(loadedModels.map((model) => model.name));
+  // if(loadedModels) {
+  //   loadedModels["Space_Ship"].rotation.y += 0.9;
+  // }
+
   requestAnimationFrame(animate);
 }
 
 requestAnimationFrame(animate);
-
 window.addEventListener("resize", onWindowResize, false);
