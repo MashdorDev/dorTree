@@ -12,7 +12,7 @@ let loadingManager,
   model,
   loadingTexture,
   loadingMesh,
-  currentScene = loadingScene;
+  currentScene;
 
 function initLoadingScene() {
   loadingScene = new THREE.Scene();
@@ -33,12 +33,10 @@ function initLoadingScene() {
 
   loadingManager = new THREE.LoadingManager();
 
-  // Loading texture
   const textureLoader = new TextureLoader(loadingManager);
   textureLoader.load("assets/textures/loading-circle.png", (texture) => {
     loadingTexture = texture;
 
-    // Loading mesh
     const loadingGeometry = new THREE.PlaneGeometry(2, 2);
     const loadingMaterial = new THREE.MeshBasicMaterial({
       map: loadingTexture,
@@ -55,7 +53,6 @@ function initLoadingScene() {
   loadMainSceneAssets();
   createSkybox();
 
-  // Set loadingManager.onLoad after calling loadMainSceneAssets
   loadingManager.onLoad = switchToMainScene;
 }
 
@@ -75,16 +72,29 @@ function loadMainSceneAssets() {
 
 function switchToMainScene() {
   if (currentScene !== loadingScene) return;
-  document.getElementById("loadingScreen").style.display = "none";
-  currentScene = mainScene;
-  animateMainScene();
-  showMainScreen();
+
+  const loadingScreen = document.getElementById("loadingScreen");
+  const canvasContainer = document.getElementById('canvas-container');
+
+  loadingScreen.style.opacity = '0';
+
+  setTimeout(() => {
+    loadingScreen.style.display = "none";
+    currentScene = mainScene;
+
+    animateMainScene();
+    showMainScreen();
+    canvasContainer.style.opacity = '1';
+  }, 2000);
 }
 
 function showMainScreen() {
   let MainScene = document.getElementById("bg");
   MainScene.style.cssText =
     "display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: -1;";
+
+  const canvasContainer = document.getElementById('canvas-container');
+  canvasContainer.style.opacity = '1';
 }
 
 function animateMainScene() {
@@ -108,22 +118,17 @@ function createSkybox() {
     vertexShader,
     fragmentShader,
     uniforms: {
-      color0: { value: colors[0] },
-      color1: { value: colors[1] },
-      color2: { value: colors[2] },
-      color3: { value: colors[3] },
+      colors: { value: colors },
     },
     depthTest: false,
   });
 
-  // Skybox
   const skyboxGeometry = new THREE.PlaneGeometry(2, 2);
   const skybox = new THREE.Mesh(skyboxGeometry, material);
   skybox.scale.set(1000, 1000, 1000);
   loadingScene.add(skybox);
 }
 
-// Adjust the renderer size and camera aspect ratio on window resize
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();

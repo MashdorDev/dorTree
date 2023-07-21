@@ -37,6 +37,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   500
 );
+setCameraPosition();
 
 // Function to handle window resize and orientation change events
 function onWindowResize() {
@@ -62,7 +63,6 @@ if (window.innerWidth < 768) {
 }
 
 // Event listeners
-window.addEventListener("resize", onWindowResize, false);
 window.addEventListener("orientationchange", onWindowResize, false);
 /*
  * Models and loader
@@ -92,9 +92,9 @@ const models = {
   },
   space_ship: {
     url: "assets/spaceShip.glb",
-    position: { x: 0, y: 0, z: -50 },
-    scale: { x: 6, y: 6, z: 6 },
-    rotation: { x: 0, y: 0, z: 0 },
+    position: { x: 0, y: 0, z: -20 },
+    scale: { x: 2, y: 2, z: 2 },
+    rotation: { x: 45, y: 90, z: 0 },
     text: "Space_Ship",
   },
 };
@@ -105,6 +105,20 @@ const progress = {
   resume: 0,
   space_ship: 0,
 };
+
+
+function setScale(object, scale) {
+  object.scale.set(scale.x, scale.y, scale.z);
+}
+
+function setPosition(object, position) {
+  object.position.set(position.x, position.y, position.z);
+}
+
+function setRotation(object, rotation) {
+  object.rotation.set(rotation.x, rotation.y, rotation.z);
+}
+
 function loadGLTFModel(modelKey) {
   const model = models[modelKey];
   console.log("Loading model:", model);
@@ -121,17 +135,9 @@ function loadGLTFModel(modelKey) {
           }
         });
 
-        gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
-        gltf.scene.position.set(
-          model.position.x,
-          model.position.y,
-          model.position.z
-        );
-        gltf.scene.rotation.set(
-          model.rotation.x,
-          model.rotation.y,
-          model.rotation.z
-        );
+        setScale(gltf.scene, model.scale);
+        setPosition(gltf.scene, model.position);
+        setRotation(gltf.scene, model.rotation);
         gltf.scene.userData.text = model.text;
         gltf.scene.name = model.text;
 
@@ -175,67 +181,68 @@ Promise.all([
   });
 
 window.addEventListener("resize", () => {
-  // Update sizes
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
 
-  // Update camera
   camera.aspect = sizes.width / sizes.height;
   camera.updateProjectionMatrix();
 
-  // Update renderer
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  setCameraPosition();
 });
 
-// Dor Zairi Text
+let loadedFont;
 fontLoader.load("assets/font/Montserrat_Medium_Regular.json", function (font) {
-  const color = new THREE.Color("white");
+  // Store the loaded font in the loadedFont variable
+  loadedFont = font;
 
-  const matLite = new THREE.MeshToonMaterial({
+  // Dor Zairi Text
+  let color = new THREE.Color("white");
+
+  let matLite = new THREE.MeshToonMaterial({
     color: color,
     side: THREE.DoubleSide,
   });
 
-  const message = "Dor Zairi";
+  let message = "Dor Zairi";
 
-  const shapes = font.generateShapes(message, 5);
+  let shapes = loadedFont.generateShapes(message, 5);
 
-  const geometry = new THREE.ShapeGeometry(shapes);
+  let geometry = new THREE.ShapeGeometry(shapes);
 
   geometry.computeBoundingBox();
 
-  const xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+  let xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
 
   geometry.translate(xMid, 0, 0);
 
-  const text = new THREE.Mesh(geometry, matLite);
+  let text = new THREE.Mesh(geometry, matLite);
   text.position.set(0, 14, -15);
   scene.add(text);
-});
 
-// resume text
-fontLoader.load("assets/font/Montserrat_Medium_Regular.json", function (font) {
-  const color = new THREE.Color("black");
+  // Resume Text
+  color = new THREE.Color("black");
 
-  const matLite = new THREE.MeshToonMaterial({
+  matLite = new THREE.MeshToonMaterial({
     color: color,
     side: THREE.DoubleSide,
   });
 
-  const message = "resume";
+  message = "resume";
 
-  const shapes = font.generateShapes(message, 1);
+  shapes = loadedFont.generateShapes(message, 1);
 
-  const geometry = new THREE.ShapeGeometry(shapes);
+  geometry = new THREE.ShapeGeometry(shapes);
 
   geometry.computeBoundingBox();
 
-  const xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+  xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
 
   geometry.translate(xMid, 0, 0);
 
-  const text = new THREE.Mesh(geometry, matLite);
+  text = new THREE.Mesh(geometry, matLite);
   text.position.set(-0.5, -2, -4);
   scene.add(text);
 });
@@ -256,10 +263,7 @@ const material = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,
   uniforms: {
-    color0: { value: colors[0] },
-    color1: { value: colors[1] },
-    color2: { value: colors[2] },
-    color3: { value: colors[3] },
+    colors: { value: colors },
   },
   depthTest: false,
 });
@@ -271,10 +275,7 @@ function updateBackgroundColor(time) {
     return color.clone().lerp(colors[nextIndex], t);
   });
 
-  material.uniforms.color0.value = newColors[0];
-  material.uniforms.color1.value = newColors[1];
-  material.uniforms.color2.value = newColors[2];
-  material.uniforms.color3.value = newColors[3];
+  material.uniforms.colors.value = newColors;
 }
 
 /*
@@ -379,41 +380,24 @@ function handleModelClick(model) {
     );
   }
 
-  function openApp(customSchemeUrl, fallbackUrl) {
-    const startTime = Date.now();
-    const timeout = 500;
-
-    window.location = customSchemeUrl;
-
-    setTimeout(function () {
-      if (Date.now() - startTime < timeout + 100) {
-        window.open(fallbackUrl, "_blank").focus();
-      }
-    }, timeout);
-  }
-
   switch (model.text) {
     case "LinkedIn":
       if (isMobileDevice()) {
         const linkedinWebUrl = "https://www.linkedin.com/in/dorz";
         const linkedinAppUrl = "linkedin://in/dorz";
-        window.location.href = linkedinAppUrl;
-        setTimeout(() => {
-          window.location.href = linkedinWebUrl;
-        }, 2000);
+        openUrl(linkedinAppUrl, linkedinWebUrl);
       } else {
         window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
       }
       break;
     case "Github":
       if (isMobileDevice()) {
-        const linkedinAppUrl = "github://profile/MashdorDev";
-        const linkedinWebUrl = "https://www.github.com/MashdorDev";
-        openApp(linkedinAppUrl, linkedinWebUrl);
+        const githubWebUrl = "https://www.github.com/MashdorDev";
+        const githubAppUrl = "github://profile/MashdorDev";
+        openUrl(githubAppUrl, githubWebUrl);
       } else {
         window.open("https://github.com/MashdorDev", "_blank").focus();
       }
-
       break;
     case "Resume":
       fetch("assets/resume/Dor Zairi - Resume.pdf")
@@ -443,11 +427,71 @@ function float(elapsedTime) {
   });
 }
 
+function openUrl(appUrl, webUrl) {
+  const startTime = Date.now();
+  const timeout = 500;
+
+  window.location = appUrl;
+
+  setTimeout(function () {
+    if (Date.now() - startTime < timeout + 100) {
+      window.open(webUrl, "_blank").focus();
+    }
+  }, timeout);
+}
+
+
+function setCameraPosition() {
+  // Update the camera position for better visibility on mobile devices
+  if (window.innerWidth < 768) {
+    camera.position.x = 0;
+    camera.position.y = 10;
+    camera.position.z = 40;
+  } else {
+    camera.position.x = 0;
+    camera.position.y = 20;
+    camera.position.z = 30;
+  }
+}
+
+
+
+
 const clock = new THREE.Clock();
 
 function animate(time) {
   const elapsedTime = clock.getElapsedTime();
   float(elapsedTime);
+
+  let speed = 0.05;
+  const rotationSpeedX = 0.01;
+  const rotationSpeed = 0.01;
+  const resetPosition = 30;
+  const startPosition = -30;
+  const model = models.space_ship.scene;
+
+  if (model) {
+    // Move the model in the x direction
+
+
+    console.log("model.position.x: ", model.position.x);
+
+    // If the model has moved past the reset position...
+    if (model.position.x > resetPosition) {
+      console.log("Resetting model position");
+      // Reset the model's position to the start
+      // model.position.x = startPosition;
+      // model.position.y = startPosition;
+      // rotate back to start
+      // model.rotation.x = 45;
+      model.position.y -= speed;
+      model.position.x -= speed;
+    } else{
+
+       model.position.x += speed;
+       model.position.y += speed;
+     }
+  }
 
   updateBackgroundColor(time);
   controls.update();
@@ -460,4 +504,3 @@ function animate(time) {
 }
 
 requestAnimationFrame(animate);
-window.addEventListener("resize", onWindowResize, false);
