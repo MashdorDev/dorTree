@@ -1,7 +1,7 @@
 /*
-* Imports
-*/
-import './loader.js';
+ * Imports
+ */
+import "./loader.js";
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -15,7 +15,6 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 const canvas = document.getElementById("bg");
 const fontLoader = new FontLoader();
 const loadedModels = [];
-
 
 const sizes = {
   width: window.innerWidth,
@@ -64,34 +63,33 @@ if (window.innerWidth < 768) {
 window.addEventListener("resize", onWindowResize, false);
 window.addEventListener("orientationchange", onWindowResize, false);
 /*
-* Models and loader
-*/
+ * Models and loader
+ */
 
 const models = {
   linkedin: {
-    url: 'assets/linkedin.glb',
+    url: "assets/linkedin.glb",
     position: { x: -10, y: 8, z: -5 },
     scale: { x: 8, y: 8, z: 8 },
     rotation: { x: -0.2, y: -0.3, z: -0.05 },
     text: "LinkedIn",
   },
   github: {
-    url: 'assets/github.glb',
+    url: "assets/github.glb",
     position: { x: 10, y: 8, z: -5 },
     scale: { x: 9, y: 9, z: 9 },
     rotation: { x: -0.1, y: -0.4, z: 0 },
     text: "Github",
-
   },
   resume: {
-    url: 'assets/resume.glb',
+    url: "assets/resume.glb",
     position: { x: 0, y: 0, z: -5 },
     scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
   },
   space_ship: {
-    url: 'assets/spaceShip.glb',
+    url: "assets/spaceShip.glb",
     position: { x: 0, y: 0, z: -50 },
     scale: { x: 6, y: 6, z: 6 },
     rotation: { x: 0, y: 0, z: 0 },
@@ -103,6 +101,7 @@ const progress = {
   linkedin: 0,
   github: 0,
   resume: 0,
+  space_ship: 0,
 };
 function loadGLTFModel(modelKey) {
   const model = models[modelKey];
@@ -121,10 +120,18 @@ function loadGLTFModel(modelKey) {
         });
 
         gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
-        gltf.scene.position.set(model.position.x, model.position.y, model.position.z);
-        gltf.scene.rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
+        gltf.scene.position.set(
+          model.position.x,
+          model.position.y,
+          model.position.z
+        );
+        gltf.scene.rotation.set(
+          model.rotation.x,
+          model.rotation.y,
+          model.rotation.z
+        );
         gltf.scene.userData.text = model.text;
-        gltf.scene.name = model.text
+        gltf.scene.name = model.text;
 
         scene.add(gltf.scene);
 
@@ -152,9 +159,8 @@ function loadGLTFModel(modelKey) {
   });
 }
 
-
 Promise.all([
-loadGLTFModel("linkedin"),
+  loadGLTFModel("linkedin"),
   loadGLTFModel("github"),
   loadGLTFModel("resume"),
   loadGLTFModel("space_ship"),
@@ -181,64 +187,56 @@ window.addEventListener("resize", () => {
 });
 
 // Dor Zairi Text
-fontLoader.load(
-  "assets/font/Montserrat_Medium_Regular.json",
-  function (font) {
-    const color = new THREE.Color("white");
+fontLoader.load("assets/font/Montserrat_Medium_Regular.json", function (font) {
+  const color = new THREE.Color("white");
 
-    const matLite = new THREE.MeshToonMaterial({
-      color: color,
-      side: THREE.DoubleSide,
-    });
+  const matLite = new THREE.MeshToonMaterial({
+    color: color,
+    side: THREE.DoubleSide,
+  });
 
-    const message = "Dor Zairi";
+  const message = "Dor Zairi";
 
-    const shapes = font.generateShapes(message, 5);
+  const shapes = font.generateShapes(message, 5);
 
-    const geometry = new THREE.ShapeGeometry(shapes);
+  const geometry = new THREE.ShapeGeometry(shapes);
 
-    geometry.computeBoundingBox();
+  geometry.computeBoundingBox();
 
-    const xMid =
-      -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+  const xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
 
-    geometry.translate(xMid, 0, 0);
+  geometry.translate(xMid, 0, 0);
 
-    const text = new THREE.Mesh(geometry, matLite);
-    text.position.set(0, 14, -15);
-    scene.add(text);
-  }
-);
+  const text = new THREE.Mesh(geometry, matLite);
+  text.position.set(0, 14, -15);
+  scene.add(text);
+});
 
 // resume text
-fontLoader.load(
-  "assets/font/Montserrat_Medium_Regular.json",
-  function (font) {
-    const color = new THREE.Color("black");
+fontLoader.load("assets/font/Montserrat_Medium_Regular.json", function (font) {
+  const color = new THREE.Color("black");
 
-    const matLite = new THREE.MeshToonMaterial({
-      color: color,
-      side: THREE.DoubleSide,
-    });
+  const matLite = new THREE.MeshToonMaterial({
+    color: color,
+    side: THREE.DoubleSide,
+  });
 
-    const message = "resume";
+  const message = "resume";
 
-    const shapes = font.generateShapes(message, 1);
+  const shapes = font.generateShapes(message, 1);
 
-    const geometry = new THREE.ShapeGeometry(shapes);
+  const geometry = new THREE.ShapeGeometry(shapes);
 
-    geometry.computeBoundingBox();
+  geometry.computeBoundingBox();
 
-    const xMid =
-      -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+  const xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
 
-    geometry.translate(xMid, 0, 0);
+  geometry.translate(xMid, 0, 0);
 
-    const text = new THREE.Mesh(geometry, matLite);
-    text.position.set(-0.5, -2, -4);
-    scene.add(text);
-  }
-);
+  const text = new THREE.Mesh(geometry, matLite);
+  text.position.set(-0.5, -2, -4);
+  scene.add(text);
+});
 
 // Gradient background setup
 const colors = [
@@ -299,15 +297,18 @@ function updateBackgroundColor(time) {
 }
 
 /*
-* Lights
-*/
+ * Lights
+ */
 
 const light = new THREE.HemisphereLight(0xffffff, 0x080820, 2);
 scene.add(light);
 
-
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(models.resume.position.x, models.resume.position.y, models.resume.position.z);
+controls.target.set(
+  models.resume.position.x,
+  models.resume.position.y,
+  models.resume.position.z
+);
 controls.enableDamping = true;
 controls.dampingFactor = 0.01;
 controls.rotateSpeed = 0.9;
@@ -326,7 +327,6 @@ backgroundScene.add(skybox);
 
 renderer.domElement.addEventListener("click", onModelClick);
 renderer.domElement.addEventListener("touchend", onModelClick);
-
 
 function onModelClick(event) {
   event.preventDefault();
@@ -398,7 +398,6 @@ function handleModelClick(model) {
     );
   }
 
-
   function openApp(customSchemeUrl, fallbackUrl) {
     const startTime = Date.now();
     const timeout = 500;
@@ -411,7 +410,6 @@ function handleModelClick(model) {
       }
     }, timeout);
   }
-
 
   switch (model.text) {
     case "LinkedIn":
@@ -427,18 +425,15 @@ function handleModelClick(model) {
       }
       break;
     case "Github":
-
-
-    if (isMobileDevice()) {
-      const linkedinAppUrl = "github://profile/MashdorDev";
-      const linkedinWebUrl = "https://www.github.com/MashdorDev";
-      openApp(linkedinAppUrl, linkedinWebUrl);
-    } else {
-      window.open("https://github.com/MashdorDev", "_blank").focus();
-    }
+      if (isMobileDevice()) {
+        const linkedinAppUrl = "github://profile/MashdorDev";
+        const linkedinWebUrl = "https://www.github.com/MashdorDev";
+        openApp(linkedinAppUrl, linkedinWebUrl);
+      } else {
+        window.open("https://github.com/MashdorDev", "_blank").focus();
+      }
 
       break;
-    // Add your app case here if needed
     case "Resume":
       fetch("assets/resume/Dor Zairi - Resume.pdf")
         .then((response) => response.blob())
@@ -458,19 +453,16 @@ function handleModelClick(model) {
   }
 }
 
-
 function float(elapsedTime) {
   scene.children.forEach((child) => {
     if (child.userData.text == "LinkedIn" || child.userData.text == "Github") {
-      child.position.y = models.linkedin.position.y + Math.sin(elapsedTime * 0.7);
+      child.position.y =
+        models.linkedin.position.y + Math.sin(elapsedTime * 0.7);
     }
   });
 }
 
-
 const clock = new THREE.Clock();
-
-
 
 function animate(time) {
   const elapsedTime = clock.getElapsedTime();

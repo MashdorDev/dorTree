@@ -1,46 +1,61 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { TextureLoader } from "three/src/loaders/TextureLoader.js";
 
-let loadingManager, loadingScene, mainScene, camera, renderer, model, loadingTexture, loadingMesh, currentScene = loadingScene;
+let loadingManager,
+  loadingScene,
+  mainScene,
+  camera,
+  renderer,
+  model,
+  loadingTexture,
+  loadingMesh,
+  currentScene = loadingScene;
 
 function initLoadingScene() {
-    loadingScene = new THREE.Scene();
-    mainScene = new THREE.Scene();
-    currentScene = loadingScene;
+  loadingScene = new THREE.Scene();
+  mainScene = new THREE.Scene();
+  currentScene = loadingScene;
 
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  renderer = new THREE.WebGLRenderer({ antialias: true });
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000);
-    document.getElementById('loadingScreen').appendChild(renderer.domElement);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000);
+  document.getElementById("loadingScreen").appendChild(renderer.domElement);
 
-    loadingManager = new THREE.LoadingManager();
+  loadingManager = new THREE.LoadingManager();
 
-    // Loading texture
-    const textureLoader = new TextureLoader(loadingManager);
-    textureLoader.load('assets/textures/loading-circle.png', (texture) => {
-      loadingTexture = texture;
+  // Loading texture
+  const textureLoader = new TextureLoader(loadingManager);
+  textureLoader.load("assets/textures/loading-circle.png", (texture) => {
+    loadingTexture = texture;
 
-      // Loading mesh
-      const loadingGeometry = new THREE.PlaneGeometry(2, 2);
-      const loadingMaterial = new THREE.MeshBasicMaterial({ map: loadingTexture, transparent: true });
-      loadingMesh = new THREE.Mesh(loadingGeometry, loadingMaterial);
-      loadingScene.add(loadingMesh);
-
-      camera.position.z = 5;
-
-      animateLoadingScene();
+    // Loading mesh
+    const loadingGeometry = new THREE.PlaneGeometry(2, 2);
+    const loadingMaterial = new THREE.MeshBasicMaterial({
+      map: loadingTexture,
+      transparent: true,
     });
+    loadingMesh = new THREE.Mesh(loadingGeometry, loadingMaterial);
+    loadingScene.add(loadingMesh);
 
-    loadMainSceneAssets();
-    createSkybox();
+    camera.position.z = 5;
 
-    // Set loadingManager.onLoad after calling loadMainSceneAssets
-    loadingManager.onLoad = switchToMainScene;
-  }
+    animateLoadingScene();
+  });
 
+  loadMainSceneAssets();
+  createSkybox();
+
+  // Set loadingManager.onLoad after calling loadMainSceneAssets
+  loadingManager.onLoad = switchToMainScene;
+}
 
 function animateLoadingScene() {
   requestAnimationFrame(animateLoadingScene);
@@ -50,7 +65,7 @@ function animateLoadingScene() {
 
 function loadMainSceneAssets() {
   const gltfLoader = new GLTFLoader(loadingManager);
-  gltfLoader.load('assets/resume.glb', (gltf) => {
+  gltfLoader.load("assets/resume.glb", (gltf) => {
     model = gltf.scene;
     mainScene.add(model);
   });
@@ -58,15 +73,16 @@ function loadMainSceneAssets() {
 
 function switchToMainScene() {
   if (currentScene !== loadingScene) return;
-  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById("loadingScreen").style.display = "none";
   currentScene = mainScene;
   animateMainScene();
   showMainScreen();
 }
 
 function showMainScreen() {
-  let MainScene = document.getElementById('bg');
-  MainScene.style.cssText = 'display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: -1;';
+  let MainScene = document.getElementById("bg");
+  MainScene.style.cssText =
+    "display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: -1;";
 }
 
 function animateMainScene() {
@@ -133,6 +149,6 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-window.addEventListener('resize', onWindowResize, false);
+window.addEventListener("resize", onWindowResize, false);
 
 initLoadingScene();
