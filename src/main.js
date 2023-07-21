@@ -7,7 +7,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
-
+import fragment from "./shaders/fragmentShader.glsl";
+import vertex from "./shaders/vertexShader.glsl";
 /*
  * Init
  */
@@ -246,30 +247,9 @@ const colors = [
   new THREE.Color(0xff0000),
 ];
 
-const vertexShader = `
-varying vec2 vUv;
+const vertexShader = vertex;
 
-void main() {
-  vUv = uv;
-  gl_Position = vec4(position, 1.0);
-}
-`;
-
-const fragmentShader = `
-varying vec2 vUv;
-uniform vec3 color0;
-uniform vec3 color1;
-uniform vec3 color2;
-uniform vec3 color3;
-
-void main() {
-  vec3 topLeft = mix(color0, color1, vUv.y);
-  vec3 bottomRight = mix(color3, color2, vUv.y);
-  vec3 color = mix(topLeft, bottomRight, vUv.x);
-
-  gl_FragColor = vec4(color, 1.0);
-}
-`;
+const fragmentShader = fragment;
 
 const material = new THREE.ShaderMaterial({
   vertexShader,

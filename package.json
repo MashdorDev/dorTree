@@ -2,6 +2,7 @@
   "name": "Dor 3D Profolio",
   "version": "0.0.1",
   "description": "A 3D Profolio",
+  "type": "module",
   "author": {
     "name": "Dor Zairi",
     "email": "dorzairidev@gmail.com"
