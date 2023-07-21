@@ -90,20 +90,13 @@ const models = {
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
   },
-  space_ship: {
-    url: "assets/spaceShip.glb",
-    position: { x: 0, y: 0, z: -20 },
-    scale: { x: 2, y: 2, z: 2 },
-    rotation: { x: 45, y: 90, z: 0 },
-    text: "Space_Ship",
-  },
+
 };
 
 const progress = {
   linkedin: 0,
   github: 0,
   resume: 0,
-  space_ship: 0,
 };
 
 
@@ -171,7 +164,6 @@ Promise.all([
   loadGLTFModel("linkedin"),
   loadGLTFModel("github"),
   loadGLTFModel("resume"),
-  loadGLTFModel("space_ship"),
 ])
   .then(() => {
     console.log("All models loaded");
@@ -459,39 +451,11 @@ function setCameraPosition() {
 
 const clock = new THREE.Clock();
 
+
+
 function animate(time) {
   const elapsedTime = clock.getElapsedTime();
   float(elapsedTime);
-
-  let speed = 0.05;
-  const rotationSpeedX = 0.01;
-  const rotationSpeed = 0.01;
-  const resetPosition = 30;
-  const startPosition = -30;
-  const model = models.space_ship.scene;
-
-  if (model) {
-    // Move the model in the x direction
-
-
-    console.log("model.position.x: ", model.position.x);
-
-    // If the model has moved past the reset position...
-    if (model.position.x > resetPosition) {
-      console.log("Resetting model position");
-      // Reset the model's position to the start
-      // model.position.x = startPosition;
-      // model.position.y = startPosition;
-      // rotate back to start
-      // model.rotation.x = 45;
-      model.position.y -= speed;
-      model.position.x -= speed;
-    } else{
-
-       model.position.x += speed;
-       model.position.y += speed;
-     }
-  }
 
   updateBackgroundColor(time);
   controls.update();
