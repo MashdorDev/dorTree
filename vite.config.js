@@ -1,12 +1,17 @@
+import glsl from "vite-plugin-glsl";
 import { defineConfig } from "vite";
-import { join } from "path";
-// vite.config.js
-export default {
+
+export default defineConfig({
+  publicDir: "./public/",
+  base: "./",
   build: {
     chunkSizeWarningLimit: 1000,
     assetsDir: "assets",
     rollupOptions: {
-      input: join(__dirname, "index.html"),
+      input: "index.html",
     },
   },
-};
+  plugins: [
+    glsl()
+  ],
+});

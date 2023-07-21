@@ -1,15 +1,23 @@
 {
-  "name": "three-demo",
-  "version": "0.0.0",
+  "name": "Dor 3D Profolio",
+  "version": "0.0.1",
+  "description": "A 3D Profolio",
+  "type": "module",
+  "author": {
+    "name": "Dor Zairi",
+    "email": "dorzairidev@gmail.com"
+  },
+  "license": "GNU GPLv3",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
     "serve": "vite preview --host"
   },
   "devDependencies": {
-    "vite": "^2.9.15"
+    "vite": "^4.4.6"
   },
   "dependencies": {
-    "three": "^0.151.3"
+    "three": "^0.154.0",
+    "vite-plugin-glsl": "^1.1.2"
   }
 }
