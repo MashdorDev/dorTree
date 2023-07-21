@@ -9,6 +9,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import fragment from "./shaders/fragmentShader.glsl";
 import vertex from "./shaders/vertexShader.glsl";
+
 /*
  * Init
  */
