@@ -85,7 +85,7 @@ function switchToMainScene() {
     animateMainScene();
     showMainScreen();
     canvasContainer.style.opacity = '1';
-  }, 2000);
+  }, 3000);
 }
 
 function showMainScreen() {

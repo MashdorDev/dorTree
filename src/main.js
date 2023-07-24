@@ -86,11 +86,10 @@ const models = {
   resume: {
     url: "assets/resume.glb",
     position: { x: 0, y: 0, z: -5 },
-    scale: { x: 3, y: 3, z: 3},
+    scale: { x: 3, y: 3, z: 3 },
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
   },
-
 };
 
 const progress = {
@@ -98,7 +97,6 @@ const progress = {
   github: 0,
   resume: 0,
 };
-
 
 function setScale(object, scale) {
   object.scale.set(scale.x, scale.y, scale.z);
@@ -321,12 +319,7 @@ function onModelClick(event) {
     (object) => !object.userData.ignoreRaycaster
   );
   const intersects = raycaster.intersectObjects(validObjects, true);
-  console.log("intersects: ", intersects);
 
-  console.log(
-    "intersects userData:",
-    intersects.map((intersect) => intersect.object.userData)
-  );
 
   const clickableIntersects = intersects.filter((intersect) => {
     let currentObject = intersect.object;
@@ -340,7 +333,6 @@ function onModelClick(event) {
     return false;
   });
 
-  console.log("clickableIntersects: ", clickableIntersects);
   if (clickableIntersects.length > 0) {
     const clickedObject = clickableIntersects[0].object;
 
@@ -432,7 +424,6 @@ function openUrl(appUrl, webUrl) {
   }, timeout);
 }
 
-
 function setCameraPosition() {
   // Update the camera position for better visibility on mobile devices
   if (window.innerWidth < 768) {
@@ -446,12 +437,7 @@ function setCameraPosition() {
   }
 }
 
-
-
-
 const clock = new THREE.Clock();
-
-
 
 function animate(time) {
   const elapsedTime = clock.getElapsedTime();
