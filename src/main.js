@@ -86,7 +86,7 @@ const models = {
   resume: {
     url: "assets/resume.glb",
     position: { x: 0, y: 0, z: -5 },
-    scale: { x: 6, y: 6, z: 6 },
+    scale: { x: 3, y: 3, z: 3},
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
   },
