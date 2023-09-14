@@ -414,31 +414,29 @@ function handleModelClick(model) {
 
 
   switch (model.text) {
+
     case "LinkedIn":
       if (isMobileDevice()) {
-        const linkedinWebUrl = "https://www.linkedin.com/in/dorz";
-        const linkedinAppUrl = "linkedin://in/dorz";
+        const linkedinAppUrl = "linkedin://profile/dorzairi";
         window.location.href = linkedinAppUrl;
-        setTimeout(() => {
-          window.location.href = linkedinWebUrl;
-        }, 2000);
+        // setTimeout(() => {
+        //   window.location.href = linkedinWebUrl;
+        // }, 2000);
       } else {
         window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
       }
       break;
+
     case "Github":
-
-
     if (isMobileDevice()) {
-      const linkedinAppUrl = "github://profile/MashdorDev";
+      const linkedinAppUrl = "github://MashdorDev";
       const linkedinWebUrl = "https://www.github.com/MashdorDev";
       openApp(linkedinAppUrl, linkedinWebUrl);
     } else {
       window.open("https://github.com/MashdorDev", "_blank").focus();
     }
-
       break;
-    // Add your app case here if needed
+
     case "Resume":
       fetch("assets/resume/Dor Zairi - Resume.pdf")
         .then((response) => response.blob())
@@ -453,6 +451,7 @@ function handleModelClick(model) {
           setTimeout(() => URL.revokeObjectURL(url), 100);
         });
       break;
+
     default:
       console.error("Unknown model:", model);
   }
