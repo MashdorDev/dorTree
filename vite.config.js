@@ -11,6 +11,14 @@ export default defineConfig({
       input: "index.html",
     },
   },
+  server: {
+    configureServer: (app) => {
+      app.use((req, res, next) => {
+        res.setHeader('X-Frame-Options', 'DENY');
+        next();
+      });
+    },
+  },
   plugins: [
     glsl()
   ],

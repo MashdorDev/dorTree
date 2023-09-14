@@ -373,6 +373,7 @@ function handleModelClick(model) {
   }
 
   switch (model.text) {
+
     case "LinkedIn":
       if (isMobileDevice()) {
         const linkedinWebUrl = "https://www.linkedin.com/in/dorz";
@@ -382,6 +383,7 @@ function handleModelClick(model) {
         window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
       }
       break;
+
     case "Github":
       if (isMobileDevice()) {
         const githubWebUrl = "https://www.github.com/MashdorDev";
@@ -405,6 +407,7 @@ function handleModelClick(model) {
           setTimeout(() => URL.revokeObjectURL(url), 100);
         });
       break;
+
     default:
       console.error("Unknown model:", model);
   }
