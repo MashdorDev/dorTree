@@ -1,12 +1,14 @@
 /*
-* Imports
-*/
-import './loader.js';
+ * Imports
+ */
+import "./loader.js";
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import fragment from "./shaders/fragmentShader.glsl";
+import vertex from "./shaders/vertexShader.glsl";
 
 /*
  * Init
@@ -15,7 +17,6 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 const canvas = document.getElementById("bg");
 const fontLoader = new FontLoader();
 const loadedModels = [];
-
 
 const sizes = {
   width: window.innerWidth,
@@ -36,6 +37,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   500
 );
+setCameraPosition();
 
 // Function to handle window resize and orientation change events
 function onWindowResize() {
@@ -61,42 +63,34 @@ if (window.innerWidth < 768) {
 }
 
 // Event listeners
-window.addEventListener("resize", onWindowResize, false);
 window.addEventListener("orientationchange", onWindowResize, false);
 /*
-* Models and loader
-*/
+ * Models and loader
+ */
 
 const models = {
   linkedin: {
-    url: 'assets/linkedin.glb',
+    url: "assets/linkedin.glb",
     position: { x: -10, y: 8, z: -5 },
     scale: { x: 8, y: 8, z: 8 },
     rotation: { x: -0.2, y: -0.3, z: -0.05 },
     text: "LinkedIn",
   },
   github: {
-    url: 'assets/github.glb',
+    url: "assets/github.glb",
     position: { x: 10, y: 8, z: -5 },
     scale: { x: 9, y: 9, z: 9 },
     rotation: { x: -0.1, y: -0.4, z: 0 },
     text: "Github",
-
   },
   resume: {
-    url: 'assets/resume.glb',
+    url: "assets/resume.glb",
     position: { x: 0, y: 0, z: -5 },
-    scale: { x: 6, y: 6, z: 6 },
+    scale: { x: 3, y: 3, z: 3},
     rotation: { x: 0, y: 0, z: 0 },
     text: "Resume",
   },
-  space_ship: {
-    url: 'assets/spaceShip.glb',
-    position: { x: 0, y: 0, z: -50 },
-    scale: { x: 6, y: 6, z: 6 },
-    rotation: { x: 0, y: 0, z: 0 },
-    text: "Space_Ship",
-  },
+
 };
 
 const progress = {
@@ -104,6 +98,20 @@ const progress = {
   github: 0,
   resume: 0,
 };
+
+
+function setScale(object, scale) {
+  object.scale.set(scale.x, scale.y, scale.z);
+}
+
+function setPosition(object, position) {
+  object.position.set(position.x, position.y, position.z);
+}
+
+function setRotation(object, rotation) {
+  object.rotation.set(rotation.x, rotation.y, rotation.z);
+}
+
 function loadGLTFModel(modelKey) {
   const model = models[modelKey];
   console.log("Loading model:", model);
@@ -120,11 +128,11 @@ function loadGLTFModel(modelKey) {
           }
         });
 
-        gltf.scene.scale.set(model.scale.x, model.scale.y, model.scale.z);
-        gltf.scene.position.set(model.position.x, model.position.y, model.position.z);
-        gltf.scene.rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
+        setScale(gltf.scene, model.scale);
+        setPosition(gltf.scene, model.position);
+        setRotation(gltf.scene, model.rotation);
         gltf.scene.userData.text = model.text;
-        gltf.scene.name = model.text
+        gltf.scene.name = model.text;
 
         scene.add(gltf.scene);
 
@@ -152,12 +160,10 @@ function loadGLTFModel(modelKey) {
   });
 }
 
-
 Promise.all([
-loadGLTFModel("linkedin"),
+  loadGLTFModel("linkedin"),
   loadGLTFModel("github"),
   loadGLTFModel("resume"),
-  loadGLTFModel("space_ship"),
 ])
   .then(() => {
     console.log("All models loaded");
@@ -167,78 +173,71 @@ loadGLTFModel("linkedin"),
   });
 
 window.addEventListener("resize", () => {
-  // Update sizes
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
 
-  // Update camera
   camera.aspect = sizes.width / sizes.height;
   camera.updateProjectionMatrix();
 
-  // Update renderer
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  setCameraPosition();
 });
 
-// Dor Zairi Text
-fontLoader.load(
-  "assets/font/Montserrat_Medium_Regular.json",
-  function (font) {
-    const color = new THREE.Color("white");
+let loadedFont;
+fontLoader.load("assets/font/Montserrat_Medium_Regular.json", function (font) {
+  // Store the loaded font in the loadedFont variable
+  loadedFont = font;
 
-    const matLite = new THREE.MeshToonMaterial({
-      color: color,
-      side: THREE.DoubleSide,
-    });
+  // Dor Zairi Text
+  let color = new THREE.Color("white");
 
-    const message = "Dor Zairi";
+  let matLite = new THREE.MeshToonMaterial({
+    color: color,
+    side: THREE.DoubleSide,
+  });
 
-    const shapes = font.generateShapes(message, 5);
+  let message = "Dor Zairi";
 
-    const geometry = new THREE.ShapeGeometry(shapes);
+  let shapes = loadedFont.generateShapes(message, 5);
 
-    geometry.computeBoundingBox();
+  let geometry = new THREE.ShapeGeometry(shapes);
 
-    const xMid =
-      -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+  geometry.computeBoundingBox();
 
-    geometry.translate(xMid, 0, 0);
+  let xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
 
-    const text = new THREE.Mesh(geometry, matLite);
-    text.position.set(0, 14, -15);
-    scene.add(text);
-  }
-);
+  geometry.translate(xMid, 0, 0);
 
-// resume text
-fontLoader.load(
-  "assets/font/Montserrat_Medium_Regular.json",
-  function (font) {
-    const color = new THREE.Color("black");
+  let text = new THREE.Mesh(geometry, matLite);
+  text.position.set(0, 14, -15);
+  scene.add(text);
 
-    const matLite = new THREE.MeshToonMaterial({
-      color: color,
-      side: THREE.DoubleSide,
-    });
+  // Resume Text
+  color = new THREE.Color("black");
 
-    const message = "resume";
+  matLite = new THREE.MeshToonMaterial({
+    color: color,
+    side: THREE.DoubleSide,
+  });
 
-    const shapes = font.generateShapes(message, 1);
+  message = "resume";
 
-    const geometry = new THREE.ShapeGeometry(shapes);
+  shapes = loadedFont.generateShapes(message, 1);
 
-    geometry.computeBoundingBox();
+  geometry = new THREE.ShapeGeometry(shapes);
 
-    const xMid =
-      -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+  geometry.computeBoundingBox();
 
-    geometry.translate(xMid, 0, 0);
+  xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
 
-    const text = new THREE.Mesh(geometry, matLite);
-    text.position.set(-0.5, -2, -4);
-    scene.add(text);
-  }
-);
+  geometry.translate(xMid, 0, 0);
+
+  text = new THREE.Mesh(geometry, matLite);
+  text.position.set(-0.5, -2, -4);
+  scene.add(text);
+});
 
 // Gradient background setup
 const colors = [
@@ -248,39 +247,15 @@ const colors = [
   new THREE.Color(0xff0000),
 ];
 
-const vertexShader = `
-varying vec2 vUv;
+const vertexShader = vertex;
 
-void main() {
-  vUv = uv;
-  gl_Position = vec4(position, 1.0);
-}
-`;
-
-const fragmentShader = `
-varying vec2 vUv;
-uniform vec3 color0;
-uniform vec3 color1;
-uniform vec3 color2;
-uniform vec3 color3;
-
-void main() {
-  vec3 topLeft = mix(color0, color1, vUv.y);
-  vec3 bottomRight = mix(color3, color2, vUv.y);
-  vec3 color = mix(topLeft, bottomRight, vUv.x);
-
-  gl_FragColor = vec4(color, 1.0);
-}
-`;
+const fragmentShader = fragment;
 
 const material = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,
   uniforms: {
-    color0: { value: colors[0] },
-    color1: { value: colors[1] },
-    color2: { value: colors[2] },
-    color3: { value: colors[3] },
+    colors: { value: colors },
   },
   depthTest: false,
 });
@@ -292,22 +267,22 @@ function updateBackgroundColor(time) {
     return color.clone().lerp(colors[nextIndex], t);
   });
 
-  material.uniforms.color0.value = newColors[0];
-  material.uniforms.color1.value = newColors[1];
-  material.uniforms.color2.value = newColors[2];
-  material.uniforms.color3.value = newColors[3];
+  material.uniforms.colors.value = newColors;
 }
 
 /*
-* Lights
-*/
+ * Lights
+ */
 
 const light = new THREE.HemisphereLight(0xffffff, 0x080820, 2);
 scene.add(light);
 
-
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(models.resume.position.x, models.resume.position.y, models.resume.position.z);
+controls.target.set(
+  models.resume.position.x,
+  models.resume.position.y,
+  models.resume.position.z
+);
 controls.enableDamping = true;
 controls.dampingFactor = 0.01;
 controls.rotateSpeed = 0.9;
@@ -326,7 +301,6 @@ backgroundScene.add(skybox);
 
 renderer.domElement.addEventListener("click", onModelClick);
 renderer.domElement.addEventListener("touchend", onModelClick);
-
 
 function onModelClick(event) {
   event.preventDefault();
@@ -398,45 +372,27 @@ function handleModelClick(model) {
     );
   }
 
-
-  function openApp(customSchemeUrl, fallbackUrl) {
-    const startTime = Date.now();
-    const timeout = 500;
-
-    window.location = customSchemeUrl;
-
-    setTimeout(function () {
-      if (Date.now() - startTime < timeout + 100) {
-        window.open(fallbackUrl, "_blank").focus();
-      }
-    }, timeout);
-  }
-
-
   switch (model.text) {
 
     case "LinkedIn":
       if (isMobileDevice()) {
-        const linkedinAppUrl = "linkedin://profile/dorzairi";
-        window.location.href = linkedinAppUrl;
-        // setTimeout(() => {
-        //   window.location.href = linkedinWebUrl;
-        // }, 2000);
+        const linkedinWebUrl = "https://www.linkedin.com/in/dorz";
+        const linkedinAppUrl = "linkedin://in/dorz";
+        openUrl(linkedinAppUrl, linkedinWebUrl);
       } else {
         window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
       }
       break;
 
     case "Github":
-    if (isMobileDevice()) {
-      const linkedinAppUrl = "github://MashdorDev";
-      const linkedinWebUrl = "https://www.github.com/MashdorDev";
-      openApp(linkedinAppUrl, linkedinWebUrl);
-    } else {
-      window.open("https://github.com/MashdorDev", "_blank").focus();
-    }
+      if (isMobileDevice()) {
+        const githubWebUrl = "https://www.github.com/MashdorDev";
+        const githubAppUrl = "github://profile/MashdorDev";
+        openUrl(githubAppUrl, githubWebUrl);
+      } else {
+        window.open("https://github.com/MashdorDev", "_blank").focus();
+      }
       break;
-
     case "Resume":
       fetch("assets/resume/Dor Zairi - Resume.pdf")
         .then((response) => response.blob())
@@ -457,14 +413,43 @@ function handleModelClick(model) {
   }
 }
 
-
 function float(elapsedTime) {
   scene.children.forEach((child) => {
     if (child.userData.text == "LinkedIn" || child.userData.text == "Github") {
-      child.position.y = models.linkedin.position.y + Math.sin(elapsedTime * 0.7);
+      child.position.y =
+        models.linkedin.position.y + Math.sin(elapsedTime * 0.7);
     }
   });
 }
+
+function openUrl(appUrl, webUrl) {
+  const startTime = Date.now();
+  const timeout = 500;
+
+  window.location = appUrl;
+
+  setTimeout(function () {
+    if (Date.now() - startTime < timeout + 100) {
+      window.open(webUrl, "_blank").focus();
+    }
+  }, timeout);
+}
+
+
+function setCameraPosition() {
+  // Update the camera position for better visibility on mobile devices
+  if (window.innerWidth < 768) {
+    camera.position.x = 0;
+    camera.position.y = 10;
+    camera.position.z = 40;
+  } else {
+    camera.position.x = 0;
+    camera.position.y = 20;
+    camera.position.z = 30;
+  }
+}
+
+
 
 
 const clock = new THREE.Clock();
@@ -482,14 +467,7 @@ function animate(time) {
   renderer.clearDepth();
   renderer.render(backgroundScene, camera);
   renderer.render(scene, camera);
-
-  // console.log(loadedModels.map((model) => model.name));
-  // if(loadedModels) {
-  //   loadedModels["Space_Ship"].rotation.y += 0.9;
-  // }
-
   requestAnimationFrame(animate);
 }
 
 requestAnimationFrame(animate);
-window.addEventListener("resize", onWindowResize, false);
