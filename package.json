@@ -14,11 +14,7 @@
     "serve": "vite preview --host"
   },
   "devDependencies": {
-<<<<<<< HEAD
-    "vite": "^2.9.16"
-=======
     "vite": "^4.4.6"
->>>>>>> d6dcd31ef18d395f75ae6a57cd2d3e4f371b4bf7
   },
   "dependencies": {
     "three": "^0.154.0",
