@@ -1,23 +1,44 @@
 {
-  "name": "Dor 3D Profolio",
-  "version": "0.0.4",
-  "description": "A 3D Profolio",
+  "name": "dor-website",
+  "version": "0.1.0",
+  "private": true,
   "type": "module",
-  "author": {
-    "name": "Dor Zairi",
-    "email": "dorzairidev@gmail.com"
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.10",
+    "vite-plugin-glsl": "^1.2.1"
   },
-  "license": "GNU GPLv3",
+  "dependencies": {
+    "@react-three/drei": "^9.92.7",
+    "@react-three/fiber": "^8.15.13",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.160.0",
+    "web-vitals": "^3.5.1"
+  },
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
     "serve": "vite preview --host"
   },
-  "devDependencies": {
-    "vite": "^4.4.6"
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
-  "dependencies": {
-    "three": "^0.154.0",
-    "vite-plugin-glsl": "^1.1.2"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
