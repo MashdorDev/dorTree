@@ -1,9 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-// import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
-// import fragment from '../shaders/fragmentShader.glsl';
-// import vertex from '../shaders/vertexShader.glsl';
 
 const ThreeScene = () => {
     const canvasContainerRef = useRef();

@@ -25,10 +25,15 @@ export default {
             },
         },
     ],
-    server:
-    {
-        host: true, // Open to local network and display URL
-    },
+    server: {
+        configureServer: (app) => {
+          app.use((req, res, next) => {
+            res.setHeader('X-Frame-Options', 'DENY');
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            next();
+          });
+        },
+      },
     build:
     {
         outDir: '../dist', // Output in the dist/ folder
