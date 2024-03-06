@@ -376,11 +376,11 @@ function handleModelClick(model) {
 
     case "LinkedIn":
       if (isMobileDevice()) {
-        const linkedinWebUrl = "https://www.linkedin.com/in/dorz";
-        const linkedinAppUrl = "linkedin://in/dorz";
+        const linkedinWebUrl = "https://www.linkedin.com/in/dorzairi";
+        const linkedinAppUrl = "linkedin://in/dorzairi";
         openUrl(linkedinAppUrl, linkedinWebUrl);
       } else {
-        window.open("https://www.linkedin.com/in/dorz", "_blank").focus();
+        window.open("https://www.linkedin.com/in/dorzairi", "_blank").focus();
       }
       break;
 
